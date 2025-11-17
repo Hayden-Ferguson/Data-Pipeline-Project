@@ -40,5 +40,5 @@ def fill_database(value_list):
 
 if __name__ == '__main__':
     #create_tables()
-    if(sys.argc>1):
+    if(len(sys.argv)>1):
         read_csv(sys.argv[1])
