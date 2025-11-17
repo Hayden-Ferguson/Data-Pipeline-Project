@@ -1,4 +1,6 @@
 import psycopg2
+import csv
+import sys
 from config import load_config
 
 def create_tables():
@@ -18,6 +20,12 @@ def create_tables():
     except (psycopg2.DatabaseError, Exception) as error:
         print(error)
 
+def read_csv(filename):
+    with open(filename, mode ='r') as file:
+        csvFile = csv.reader(file)
+        for lines in csvFile:
+            print(lines)
+
 def fill_database(value_list):
     sql = "INSERT INTO placeholder(value) VALUES(%s) RETURNING *"
     config = load_config()
@@ -31,4 +39,6 @@ def fill_database(value_list):
         print(error)
 
 if __name__ == '__main__':
-    create_tables()
+    #create_tables()
+    if(sys.argc>1):
+        read_csv(sys.argv[1])
