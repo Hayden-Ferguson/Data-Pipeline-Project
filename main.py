@@ -7,18 +7,55 @@ from config import load_config
 #Exact details of database undecided
 #Creates the tables for the database
 def create_tables():
-    commands = (
+    command = ( #Command to create table. Unsure if all variables should be NOT NULL
         """
-        CREATE TABLE placeholder(
-        
+        CREATE TABLE employees(
+            employee_number SERIAL PRIMARY KEY,
+            age INTEGER NOT NULL,
+            attrition BOOLEAN DEFAULT FALSE,
+            buisness_travel VARCHAR(20) NOT NULL,
+            daily_rate INTEGER NOT NULL,
+            department VARCHAR(30) NOT NULL,
+            distance_from_home INTEGER NOT NULL,
+            education INTEGER NOT NULL,
+            education_field VARCHAR(30) NOT NULL,
+            employee_count INTEGER DEFAULT 1,
+            environment_satisfaction INTEGER,
+            gender VARCHAR(20),
+            hourly_rate INTEGER NOT NULL,
+            job_involvement INTEGER,
+            job_level INTEGER NOT NULL,
+            job_role VARCHAR(30) NOT NULL,
+            marital_status VARCHAR(10),
+            monthly_income INTEGER NOT NULL,
+            monthly_rate INTEGER NOT NULL,
+            num_companies INTEGER,
+            over_18 BOOLEAN DEFAULT TRUE,
+            overtime BOOLEAN DEFAULT FALSE,
+            percent_salary_hike INTEGER,
+            performance_rating INTEGER,
+            relationship_status INTEGER,
+            standard_hours INTEGER DEFAULT 80,
+            stock_option_level INTEGER,
+            total_working_years INTEGER,
+            training_time_last_year INTEGER,
+            work_life_balance INTEGER,
+            years_at_company INTEGER DEFAULT 0,
+            years_in_current_role INTEGER DEFAULT 0,
+            years_since_last_promotion INTEGER DEFAULT 0,
+            years_with_current_manager INTEGER DEFAULT 0
         )
         """)
     try:
         config = load_config()
         with psycopg2.connect(**config) as conn:
             with conn.cursor() as cur:
-                for command in commands:
+                cur.execute("SELECT EXISTS(SELECT 1 FROM information_schema.tables WHERE table_name='employees')") #Determines if a table exists
+                if(not cur.fetchone()[0]): #If no row exists, showing the table doesn't exists
                     cur.execute(command)
+                    print("Employees table created")
+                else:
+                    print("Employees table already exists")
     except (psycopg2.DatabaseError, Exception) as error:
         print(error)
 
@@ -74,6 +111,6 @@ def fill_database(value_list):
         print(error)
 
 if __name__ == '__main__':
-    #create_tables()    Not yet applicable
-    if(len(sys.argv)>1):
+    create_tables()
+    if(len(sys.argv)>1): #If there are parameters to calling the main function
         read_files(sys.argv[1:])
