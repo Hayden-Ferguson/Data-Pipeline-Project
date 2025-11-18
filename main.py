@@ -7,43 +7,43 @@ from config import load_config
 #Exact details of database undecided
 #Creates the tables for the database
 def create_tables():
-    command = ( #Command to create table. Unsure if all variables should be NOT NULL
+    command = ( #Command to create table. SERIAL PRIMARY KEY might cause new emplyees to be skipped if they don't have one
         """
         CREATE TABLE employees(
             employee_number SERIAL PRIMARY KEY,
-            age INTEGER NOT NULL,
+            age INTEGER NOT NULL CHECK (age > 17),
             attrition BOOLEAN DEFAULT FALSE,
             buisness_travel VARCHAR(20) NOT NULL,
-            daily_rate INTEGER NOT NULL,
+            daily_rate INTEGER NOT NULL CHECK (daily_rate > 0),
             department VARCHAR(30) NOT NULL,
-            distance_from_home INTEGER NOT NULL,
-            education INTEGER NOT NULL,
+            distance_from_home INTEGER NOT NULL CHECK (distance_from_home > -1),
+            education INTEGER NOT NULL CHECK (education > 0 AND education < 6),
             education_field VARCHAR(30) NOT NULL,
-            employee_count INTEGER DEFAULT 1,
-            environment_satisfaction INTEGER,
+            employee_count INTEGER DEFAULT 1 CHECK (employee_count = 1),
+            environment_satisfaction INTEGER CHECK (environment_satisfcation > 0 AND environment_satisfaction < 6),
             gender VARCHAR(20),
-            hourly_rate INTEGER NOT NULL,
-            job_involvement INTEGER,
-            job_level INTEGER NOT NULL,
+            hourly_rate INTEGER NOT NULL CHECK (hourly_rate > 0),
+            job_involvement INTEGER CHECK (job_involvement > 0 AND job_involvement < 6),
+            job_level INTEGER NOT NULL CHECK (job_level > 0 AND job_level < 6),
             job_role VARCHAR(30) NOT NULL,
             marital_status VARCHAR(10),
-            monthly_income INTEGER NOT NULL,
-            monthly_rate INTEGER NOT NULL,
-            num_companies INTEGER,
-            over_18 BOOLEAN DEFAULT TRUE,
+            monthly_income INTEGER NOT NULL CHECK (monthly_oncome > 0),
+            monthly_rate INTEGER NOT NULL CHECK (monthly_rate > 0),
+            num_companies INTEGER CHECK (num_companies > -1),
+            over_18 BOOLEAN DEFAULT TRUE CHECK (over_18 = true),
             overtime BOOLEAN DEFAULT FALSE,
             percent_salary_hike INTEGER,
-            performance_rating INTEGER,
-            relationship_status INTEGER,
-            standard_hours INTEGER DEFAULT 80,
-            stock_option_level INTEGER,
-            total_working_years INTEGER,
-            training_time_last_year INTEGER,
-            work_life_balance INTEGER,
-            years_at_company INTEGER DEFAULT 0,
-            years_in_current_role INTEGER DEFAULT 0,
-            years_since_last_promotion INTEGER DEFAULT 0,
-            years_with_current_manager INTEGER DEFAULT 0
+            performance_rating INTEGER CHECK (performance_rating > 0 AND performance_rating < 6),
+            relationship_status INTEGER CHECK (relationship_status > 0 AND relationship_status < 6),
+            standard_hours INTEGER DEFAULT 80 CHECK (standard_hours > 0),
+            stock_option_level INTEGER CHECK (stock_option_level > -1),
+            total_working_years INTEGER CHECK (total_working_years > -1),
+            training_time_last_year INTEGER CHECK (training_time_last_year > -1),
+            work_life_balance INTEGER CHECK (work_life_balance > 0 AND work_life_balance < 6),
+            years_at_company INTEGER DEFAULT 0 CHECK (years_at_compant > -1),
+            years_in_current_role INTEGER DEFAULT 0 CHECK (years_in_current_role > -1),
+            years_since_last_promotion INTEGER DEFAULT 0 CHECK (years_since_last_promotion > -1),
+            years_with_current_manager INTEGER DEFAULT 0 CHECK (years_with_current_manager > -1)
         )
         """)
     try:
