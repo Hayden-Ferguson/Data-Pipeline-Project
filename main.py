@@ -1,10 +1,11 @@
 import psycopg2
 import csv
+import json
 import sys
 from config import load_config
 
+#Exact details of database undecided
 def create_tables():
-    """ Create tables in the PostgreSQL database"""
     commands = (
         """
         CREATE TABLE placeholder(
@@ -26,8 +27,13 @@ def read_csv(filename):
         for lines in csvFile:
             print(lines)
 
+def read_json(filename):
+    with open(filename, mode ='r') as file:
+        data = json.load(file)
+        print(json.dump(data))
+
 def fill_database(value_list):
-    sql = "INSERT INTO placeholder(value) VALUES(%s) RETURNING *"
+    sql = "INSERT INTO placeholder(value) VALUES(%s) RETURNING *" #Change when database details decided
     config = load_config()
     try:
         with  psycopg2.connect(**config) as conn:
@@ -39,6 +45,6 @@ def fill_database(value_list):
         print(error)
 
 if __name__ == '__main__':
-    #create_tables()
+    #create_tables()    Not yet applicable
     if(len(sys.argv)>1):
         read_csv(sys.argv[1])
