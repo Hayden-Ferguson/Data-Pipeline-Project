@@ -5,6 +5,7 @@ import sys
 from config import load_config
 
 #Exact details of database undecided
+#Creates the tables for the database
 def create_tables():
     commands = (
         """
@@ -21,17 +22,45 @@ def create_tables():
     except (psycopg2.DatabaseError, Exception) as error:
         print(error)
 
+#Reads and prints a csv file
 def read_csv(filename):
-    with open(filename, mode ='r') as file:
-        csvFile = csv.reader(file)
-        for lines in csvFile:
-            print(lines)
+    try:
+        with open(filename, mode ='r') as file:
+            csvFile = csv.reader(file)
+            for lines in csvFile:
+                print(lines)
+    except FileNotFoundError:
+        print(f"Error: The file {filename} could not be found.")
+    except csv.Error as e:
+        print(f"Error: Failed to decode csv from the file {filename}: {e}")
+    except Exception as e:
+        print(f"Error: The following error occured trying to read csv from {filename}: {e}")
 
+#Reads and prints a JSON file
 def read_json(filename):
-    with open(filename, mode ='r') as file:
-        data = json.load(file)
-        print(json.dump(data))
+    try:
+        with open(filename, mode ='r') as file:
+            for line in file:
+                data = json.loads(line) #load and loads are for file vs string
+                print(json.dumps(data)) #same for dump and dumps
+    except FileNotFoundError:
+        print(f"Error: The file {filename} could not be found.")
+    except json.JSONDecodeError as e:
+        print(f"Error: Failed to decode JSON from the file {filename}: {e}")
+    except Exception as e:
+        print(f"Error: The following error occured trying to read JSON from {filename}: {e}")
 
+#Takes a list of files, and decides to read them as CSV or JSON files
+def read_files(filenames):
+    for filename in filenames:
+        if filename.endswith(".csv"):
+            read_csv(filename)
+        elif filename.endswith(".json"):
+            read_json(filename)
+        else:
+            print("Invalid command/file")
+
+#Fills database with values (Currently empty)
 def fill_database(value_list):
     sql = "INSERT INTO placeholder(value) VALUES(%s) RETURNING *" #Change when database details decided
     config = load_config()
@@ -47,4 +76,4 @@ def fill_database(value_list):
 if __name__ == '__main__':
     #create_tables()    Not yet applicable
     if(len(sys.argv)>1):
-        read_csv(sys.argv[1])
+        read_files(sys.argv[1:])
