@@ -20,14 +20,14 @@ def create_tables():
             education INTEGER NOT NULL CHECK (education > 0 AND education < 6),
             education_field VARCHAR(30) NOT NULL,
             employee_count INTEGER DEFAULT 1 CHECK (employee_count = 1),
-            environment_satisfaction INTEGER CHECK (environment_satisfcation > 0 AND environment_satisfaction < 6),
+            environment_satisfaction INTEGER CHECK (environment_satisfaction > 0 AND environment_satisfaction < 6),
             gender VARCHAR(20),
             hourly_rate INTEGER NOT NULL CHECK (hourly_rate > 0),
             job_involvement INTEGER CHECK (job_involvement > 0 AND job_involvement < 6),
             job_level INTEGER NOT NULL CHECK (job_level > 0 AND job_level < 6),
             job_role VARCHAR(30) NOT NULL,
             marital_status VARCHAR(10),
-            monthly_income INTEGER NOT NULL CHECK (monthly_oncome > 0),
+            monthly_income INTEGER NOT NULL CHECK (monthly_income > 0),
             monthly_rate INTEGER NOT NULL CHECK (monthly_rate > 0),
             num_companies INTEGER CHECK (num_companies > -1),
             over_18 BOOLEAN DEFAULT TRUE CHECK (over_18 = true),
@@ -40,7 +40,7 @@ def create_tables():
             total_working_years INTEGER CHECK (total_working_years > -1),
             training_time_last_year INTEGER CHECK (training_time_last_year > -1),
             work_life_balance INTEGER CHECK (work_life_balance > 0 AND work_life_balance < 6),
-            years_at_company INTEGER DEFAULT 0 CHECK (years_at_compant > -1),
+            years_at_company INTEGER DEFAULT 0 CHECK (years_at_company > -1),
             years_in_current_role INTEGER DEFAULT 0 CHECK (years_in_current_role > -1),
             years_since_last_promotion INTEGER DEFAULT 0 CHECK (years_since_last_promotion > -1),
             years_with_current_manager INTEGER DEFAULT 0 CHECK (years_with_current_manager > -1)
@@ -50,13 +50,26 @@ def create_tables():
         config = load_config()
         with psycopg2.connect(**config) as conn:
             with conn.cursor() as cur:
-                cur.execute("SELECT EXISTS(SELECT 1 FROM information_schema.tables WHERE table_name='employees')") #Determines if a table exists
-                if(not cur.fetchone()[0]): #If no row exists, showing the table doesn't exists
+                cur.execute("SELECT EXISTS(SELECT 1 FROM information_schema.tables WHERE table_name='employees')") #Determines if the employees table exists
+                if(not cur.fetchone()[0]): #If table doesn't exist
                     cur.execute(command)
                     print("Employees table created")
                 else:
                     print("Employees table already exists")
     except (psycopg2.DatabaseError, Exception) as error:
+        print(error)
+
+#Fills database with values (Currently empty)
+def fill_database(value_list):
+    sql = "INSERT INTO placeholder(value) VALUES(%s) RETURNING *" #Change when database details decided
+    config = load_config()
+    try:
+        with  psycopg2.connect(**config) as conn:
+            with  conn.cursor() as cur:
+                cur.executemany(sql, value_list)
+
+            conn.commit()
+    except (Exception, psycopg2.DatabaseError) as error:
         print(error)
 
 #Reads and prints a csv file
@@ -87,30 +100,34 @@ def read_json(filename):
     except Exception as e:
         print(f"Error: The following error occured trying to read JSON from {filename}: {e}")
 
-#Takes a list of files, and decides to read them as CSV or JSON files
-def read_files(filenames):
-    for filename in filenames:
-        if filename.endswith(".csv"):
-            read_csv(filename)
-        elif filename.endswith(".json"):
-            read_json(filename)
+def drop_tables():
+    try:
+        config = load_config()
+        sql = "DROP TABLE employees" #Change when database details decided
+        with psycopg2.connect(**config) as conn:
+            with conn.cursor() as cur:
+                cur.execute("SELECT EXISTS(SELECT 1 FROM information_schema.tables WHERE table_name='employees')") #Determines if employees table exists
+                if(cur.fetchone()[0]): #If table exists
+                    cur.execute(sql)
+                    print("Table Employees dropped")
+                else:
+                    print("Employees table does not exist")
+    except (psycopg2.DatabaseError, Exception) as e:
+        print(f"Failed to drop table Employees: {e}")
+
+#Takes a list of commands and performs them, reading any csv or json files it reads
+def read_commands(commands):
+    for command in commands:
+        if command.endswith(".csv"):
+            read_csv(command)
+        elif command.endswith(".json"):
+            read_json(command)
+        elif command == "drop":
+            drop_tables()
         else:
             print("Invalid command/file")
-
-#Fills database with values (Currently empty)
-def fill_database(value_list):
-    sql = "INSERT INTO placeholder(value) VALUES(%s) RETURNING *" #Change when database details decided
-    config = load_config()
-    try:
-        with  psycopg2.connect(**config) as conn:
-            with  conn.cursor() as cur:
-                cur.executemany(sql, value_list)
-
-            conn.commit()
-    except (Exception, psycopg2.DatabaseError) as error:
-        print(error)
 
 if __name__ == '__main__':
     create_tables()
     if(len(sys.argv)>1): #If there are parameters to calling the main function
-        read_files(sys.argv[1:])
+        read_commands(sys.argv[1:])
