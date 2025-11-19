@@ -5,12 +5,22 @@ import sys
 import re
 from config import load_config
 
-#Exact details of database undecided
-#Creates the tables for the database
+#Returns True if the employees table exists, returns False otherwise
+def table_exists():
+    try:
+        config = load_config()
+        with psycopg2.connect(**config) as conn:
+            with conn.cursor() as cur:
+                cur.execute("SELECT EXISTS(SELECT 1 FROM information_schema.tables WHERE table_name='employees')") #Determines if the employees table exists
+                return cur.fetchone()[0]
+    except (psycopg2.DatabaseError, Exception) as error:
+        print(error)
+
+#Creates the table for the sql database
 def create_tables():
     command = ( #Command to create table. More standardized names.
         #SERIAL PRIMARY KEY might cause new emplyees to be skipped if they use default SERIAL number. 
-        #over_18, daily_rate, monthly_income, and employee_count removed
+        #over_18, daily_rate, monthly_income, and employee_count removed. years_with_curr_manager became years_with_current_manager
         """
         CREATE TABLE employees(
             employee_number SERIAL PRIMARY KEY,
@@ -49,11 +59,10 @@ def create_tables():
         config = load_config()
         with psycopg2.connect(**config) as conn:
             with conn.cursor() as cur:
-                cur.execute("SELECT EXISTS(SELECT 1 FROM information_schema.tables WHERE table_name='employees')") #Determines if the employees table exists
-                if(not cur.fetchone()[0]): #If table doesn't exist
+                if(not table_exists()): #If table doesn't exist
                     cur.execute(command)
                     print("Employees table created")
-                else:
+                else: #Shouldn't happen from main function
                     print("Employees table already exists")
     except (psycopg2.DatabaseError, Exception) as error:
         print(error)
@@ -92,8 +101,7 @@ def read_csv(filename):
                 elif catagory == "yearswithcurrentmanager": #In case of CSV file using our SQL scehmatics
                     catagoryDict["yearswithcurrmanager"]=i
             for lines in csvFile:
-                pass
-                #print(lines)
+                pass #FINISH
     except FileNotFoundError:
         print(f"Error: The file {filename} could not be found.")
     except csv.Error as e:
@@ -143,6 +151,7 @@ def read_commands(commands):
             print("Invalid command/file")
 
 if __name__ == '__main__':
-    create_tables()
-    if(len(sys.argv)>1): #If there are parameters to calling the main function
+    if not table_exists(): #if the employees table doesn't exist, create it
+        create_tables()
+    if len(sys.argv)>1: #If there are parameters to calling the main function
         read_commands(sys.argv[1:])
