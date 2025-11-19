@@ -83,13 +83,32 @@ def fill_database(value_list):
 
 #Gets a properly ordered list of values, and checks if it's valid.
 def check_valid(value_list):
-    pass
+    notNullCatagories = [0, 1, 3, 4, 6, 7, 10, 12, 13, 15]
+    for catagory in notNullCatagories:
+        value = value_list[catagory]
+        if value == None or value == "": #assume empty entires in csv means Null
+            return False
+    if int(value_list[1]) < 18: #Not an adult
+        return False
+    nonNegativeCatagories = [5, 10, 15, 16, 21, 22, 23, 24, 26, 27, 28, 29]
+    for catagory in nonNegativeCatagories:
+        value = value_list[catagory]
+        if value[catagory] != None and (not re.match(r'^[+-]?[0-9]+$', value) or int(value) < 0): #not Null and not an integer or negative
+            return False
+    gradingCatagories = [6, 8, 11, 12, 19, 20, 25]
+    for catagory in gradingCatagories:
+        value = value_list[catagory]
+        if value[catagory] != None and (not re.match(r'^[+-]?[0-9]+$', value) or int(value) < 1 or int(value > 5)): #not Null and not an integer or outside 1-5 range
+            return False
+    
+    return True
 
 #Reads a csv file #UNFINISHED
 def read_csv(filename):
     try:
         with open(filename, mode ='r') as file:
             csvFile = csv.reader(file)
+
             #Find catagories from CSV file to match up to SQL table
             #Dictionary standardized to help clean data. yearswithcurrmanager is from original data
             catagoryDict = {"employeenumber": None, "age": None, "attrition": None, "businesstravel": None, "department": None, "distancefromhome": None,\
@@ -105,11 +124,13 @@ def read_csv(filename):
                     catagoryDict[catagory] = i
                 elif catagory == "yearswithcurrentmanager": #In case of CSV file using our SQL scehmatics
                     catagoryDict["yearswithcurrmanager"]=i
-            notNullCatagories = ["employee_number", "age", "business_travel", "department", "education", "education_field", "hourly_rate", "job_level", "job_role", "monethly_rate"]
+            notNullCatagories = ["employeenumber", "age", "businesstravel", "department", "education", "educationfield", "hourlyrate", "joblevel", "jobrole", "monthlyrate"]
             for catagory in notNullCatagories:
                 if catagoryDict[catagory] == None: #If a Not Null field is Null
                     print(f"Missing catagories in CSV file {filename}.")
                     return
+            test = next(csvFile) #DEBUG
+            print(check_valid(test))
             for lines in csvFile:
                 pass #FINISH
     except FileNotFoundError:
