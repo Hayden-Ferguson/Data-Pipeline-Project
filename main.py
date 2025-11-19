@@ -2,24 +2,25 @@ import psycopg2
 import csv
 import json
 import sys
+import re
 from config import load_config
 
 #Exact details of database undecided
 #Creates the tables for the database
 def create_tables():
-    command = ( #Command to create table. SERIAL PRIMARY KEY might cause new emplyees to be skipped if they don't have one
+    command = ( #Command to create table. More standardized names.
+        #SERIAL PRIMARY KEY might cause new emplyees to be skipped if they use default SERIAL number. 
+        #over_18, daily_rate, monthly_income, and employee_count removed
         """
         CREATE TABLE employees(
             employee_number SERIAL PRIMARY KEY,
             age INTEGER NOT NULL CHECK (age > 17),
             attrition BOOLEAN DEFAULT FALSE,
-            buisness_travel VARCHAR(20) NOT NULL,
-            daily_rate INTEGER NOT NULL CHECK (daily_rate > 0),
+            business_travel VARCHAR(20) NOT NULL,
             department VARCHAR(30) NOT NULL,
             distance_from_home INTEGER NOT NULL CHECK (distance_from_home > -1),
             education INTEGER NOT NULL CHECK (education > 0 AND education < 6),
             education_field VARCHAR(30) NOT NULL,
-            employee_count INTEGER DEFAULT 1 CHECK (employee_count = 1),
             environment_satisfaction INTEGER CHECK (environment_satisfaction > 0 AND environment_satisfaction < 6),
             gender VARCHAR(20),
             hourly_rate INTEGER NOT NULL CHECK (hourly_rate > 0),
@@ -27,18 +28,16 @@ def create_tables():
             job_level INTEGER NOT NULL CHECK (job_level > 0 AND job_level < 6),
             job_role VARCHAR(30) NOT NULL,
             marital_status VARCHAR(10),
-            monthly_income INTEGER NOT NULL CHECK (monthly_income > 0),
             monthly_rate INTEGER NOT NULL CHECK (monthly_rate > 0),
-            num_companies INTEGER CHECK (num_companies > -1),
-            over_18 BOOLEAN DEFAULT TRUE CHECK (over_18 = true),
+            num_companies_worked INTEGER CHECK (num_companies_worked > -1),
             overtime BOOLEAN DEFAULT FALSE,
             percent_salary_hike INTEGER,
             performance_rating INTEGER CHECK (performance_rating > 0 AND performance_rating < 6),
-            relationship_status INTEGER CHECK (relationship_status > 0 AND relationship_status < 6),
+            relationship_satisfaction INTEGER CHECK (relationship_satisfaction > 0 AND relationship_satisfaction < 6),
             standard_hours INTEGER DEFAULT 80 CHECK (standard_hours > 0),
             stock_option_level INTEGER CHECK (stock_option_level > -1),
             total_working_years INTEGER CHECK (total_working_years > -1),
-            training_time_last_year INTEGER CHECK (training_time_last_year > -1),
+            training_times_last_year INTEGER CHECK (training_times_last_year > -1),
             work_life_balance INTEGER CHECK (work_life_balance > 0 AND work_life_balance < 6),
             years_at_company INTEGER DEFAULT 0 CHECK (years_at_company > -1),
             years_in_current_role INTEGER DEFAULT 0 CHECK (years_in_current_role > -1),
@@ -77,8 +76,24 @@ def read_csv(filename):
     try:
         with open(filename, mode ='r') as file:
             csvFile = csv.reader(file)
+            #Find catagories from CSV file to match up to SQL table
+            #Dictionary standardized to help clean data. yearswithcurrmanager is from original data
+            catagoryDict = {"employeenumber": None, "age": None, "attrition": None, "businesstravel": None, "department": None, "distancefromhome": None,\
+                        "education": None, "educationfield": None, "environmentsatisfaction": None, "gender": None, "hourlyrate": None, "jobinvolvement": None,\
+                        "joblevel": None, "jobrole": None, "maritalstatus": None, "monthlyrate": None, "numcompaniesworked": None, "overtime": None,\
+                        "percentsalaryhike": None, "relationshipsatisfaction": None, "standardhours": None, "stockoptionlevel": None, "totalworkingyears": None,\
+                        "trainingtimeslastyear": None, "worklifebalance": None, "yearsatcompany": None, "yearsincurrentrole": None,\
+                        "yearssincelastpromotion": None, "yearswithcurrmanager": None}
+            catagories = next(csvFile)
+            for i in range(len(catagories)):
+                catagory = re.sub(r'[^a-zA-Z]', '', catagories[i]).lower()
+                if re.sub(r'[^a-zA-Z]', '', catagories[i]).lower() in catagoryDict.keys(): #remove capitalization and non-letters
+                    catagoryDict[catagory] = i
+                elif catagory == "yearswithcurrentmanager": #In case of CSV file using our SQL scehmatics
+                    catagoryDict["yearswithcurrmanager"]=i
             for lines in csvFile:
-                print(lines)
+                pass
+                #print(lines)
     except FileNotFoundError:
         print(f"Error: The file {filename} could not be found.")
     except csv.Error as e:
@@ -115,7 +130,7 @@ def drop_tables():
     except (psycopg2.DatabaseError, Exception) as e:
         print(f"Failed to drop table Employees: {e}")
 
-#Takes a list of commands and performs them, reading any csv or json files it reads
+#Takes a list of commands and performs them, reading any csv or json files given
 def read_commands(commands):
     for command in commands:
         if command.endswith(".csv"):
