@@ -21,6 +21,7 @@ def create_tables():
     command = ( #Command to create table. More standardized names.
         #SERIAL PRIMARY KEY might cause new emplyees to be skipped if they use default SERIAL number. 
         #over_18, daily_rate, monthly_income, and employee_count removed. years_with_curr_manager became years_with_current_manager
+        #assume people who do not have all field filled out are new employees
         """
         CREATE TABLE employees(
             employee_number SERIAL PRIMARY KEY,
@@ -28,7 +29,7 @@ def create_tables():
             attrition BOOLEAN DEFAULT FALSE,
             business_travel VARCHAR(20) NOT NULL,
             department VARCHAR(30) NOT NULL,
-            distance_from_home INTEGER NOT NULL CHECK (distance_from_home > -1),
+            distance_from_home INTEGER CHECK (distance_from_home > -1),
             education INTEGER NOT NULL CHECK (education > 0 AND education < 6),
             education_field VARCHAR(30) NOT NULL,
             environment_satisfaction INTEGER CHECK (environment_satisfaction > 0 AND environment_satisfaction < 6),
@@ -41,7 +42,7 @@ def create_tables():
             monthly_rate INTEGER NOT NULL CHECK (monthly_rate > 0),
             num_companies_worked INTEGER CHECK (num_companies_worked > -1),
             overtime BOOLEAN DEFAULT FALSE,
-            percent_salary_hike INTEGER,
+            percent_salary_hike INTEGER DEFAULT 0,
             performance_rating INTEGER CHECK (performance_rating > 0 AND performance_rating < 6),
             relationship_satisfaction INTEGER CHECK (relationship_satisfaction > 0 AND relationship_satisfaction < 6),
             standard_hours INTEGER DEFAULT 80 CHECK (standard_hours > 0),
@@ -80,7 +81,11 @@ def fill_database(value_list):
     except (Exception, psycopg2.DatabaseError) as error:
         print(error)
 
-#Reads and prints a csv file
+#Gets a properly ordered list of values, and checks if it's valid.
+def check_valid(value_list):
+    pass
+
+#Reads a csv file #UNFINISHED
 def read_csv(filename):
     try:
         with open(filename, mode ='r') as file:
@@ -100,6 +105,11 @@ def read_csv(filename):
                     catagoryDict[catagory] = i
                 elif catagory == "yearswithcurrentmanager": #In case of CSV file using our SQL scehmatics
                     catagoryDict["yearswithcurrmanager"]=i
+            notNullCatagories = ["employee_number", "age", "business_travel", "department", "education", "education_field", "hourly_rate", "job_level", "job_role", "monethly_rate"]
+            for catagory in notNullCatagories:
+                if catagoryDict[catagory] == None: #If a Not Null field is Null
+                    print(f"Missing catagories in CSV file {filename}.")
+                    return
             for lines in csvFile:
                 pass #FINISH
     except FileNotFoundError:
@@ -123,14 +133,14 @@ def read_json(filename):
     except Exception as e:
         print(f"Error: The following error occured trying to read JSON from {filename}: {e}")
 
+#Drops the employee table. Mostly used for resetting the employee table.
 def drop_tables():
     try:
         config = load_config()
         sql = "DROP TABLE employees" #Change when database details decided
         with psycopg2.connect(**config) as conn:
             with conn.cursor() as cur:
-                cur.execute("SELECT EXISTS(SELECT 1 FROM information_schema.tables WHERE table_name='employees')") #Determines if employees table exists
-                if(cur.fetchone()[0]): #If table exists
+                if(table_exists()): #If table exists
                     cur.execute(sql)
                     print("Table Employees dropped")
                 else:
