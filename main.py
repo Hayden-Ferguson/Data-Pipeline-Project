@@ -101,7 +101,18 @@ def check_valid(value_list):
         if value[catagory] != None and (not re.match(r'^[+-]?[0-9]+$', value) or int(value) < 1 or int(value > 5)): #not Null and not an integer or outside 1-5 range
             return False
     
-    return True
+    return True #Everything checks out
+
+#Gets a list of ordered inputs, returns a tuple of a list of valid and non-valid inputs
+def check_all_valid(inputs):
+    valid = []
+    invalid = []
+    for input in inputs:
+        if check_valid(input):
+            valid.append(input)
+        else:
+            invalid.append(input)
+    return (tuple(valid), tuple(invalid))
 
 #Reads a csv file #UNFINISHED
 def read_csv(filename):
