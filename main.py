@@ -84,19 +84,19 @@ def fill_database(value_list):
 #Gets a properly ordered list of values, and checks if it's valid.
 def check_valid(value_list):
     notNullCatagories = [0, 1, 3, 4, 6, 7, 10, 12, 13, 15]
-    for catagory in notNullCatagories:
+    for catagory in notNullCatagories: #Not null field is null
         value = value_list[catagory]
         if value == None or value == "": #assume empty entires in csv means Null
             return False
     if int(value_list[1]) < 18: #Not an adult
         return False
     nonNegativeCatagories = [5, 10, 15, 16, 21, 22, 23, 24, 26, 27, 28, 29]
-    for catagory in nonNegativeCatagories:
+    for catagory in nonNegativeCatagories: #Field that be a non-negative integer isn't
         value = value_list[catagory]
         if value[catagory] != None and (not re.match(r'^[+-]?[0-9]+$', value) or int(value) < 0): #not Null and not an integer or negative
             return False
     gradingCatagories = [6, 8, 11, 12, 19, 20, 25]
-    for catagory in gradingCatagories:
+    for catagory in gradingCatagories: #Field for 1-5 integer grading has value outside of that.
         value = value_list[catagory]
         if value[catagory] != None and (not re.match(r'^[+-]?[0-9]+$', value) or int(value) < 1 or int(value > 5)): #not Null and not an integer or outside 1-5 range
             return False
@@ -113,6 +113,25 @@ def check_all_valid(inputs):
         else:
             invalid.append(input)
     return (tuple(valid), tuple(invalid))
+
+#given a list of values, the desired parameter, and a dictionary of parameters and positions, return the desired parameter
+def get_csv_param(value_list, param, catagoryDict):
+    if catagoryDict[param] == None:
+        return None
+    return value_list[catagoryDict[param]]
+
+#Given a value list and a dictionary of parameters and positions, returns an ordered list of parameters
+def sort_csv_params(value_list, catagoryDict):
+    return [get_csv_param(value_list, "employeenumber", catagoryDict), get_csv_param(value_list, "age", catagoryDict), get_csv_param(value_list, "emplattritionoyeenumber", catagoryDict), \
+            get_csv_param(value_list, "buisnesstravel", catagoryDict), get_csv_param(value_list, "department", catagoryDict), get_csv_param(value_list, "distancefromhome", catagoryDict), \
+            get_csv_param(value_list, "education", catagoryDict), get_csv_param(value_list, "educationfield", catagoryDict), get_csv_param(value_list, "environmentsatisfaction", catagoryDict), \
+            get_csv_param(value_list, "gender", catagoryDict), get_csv_param(value_list, "hourlyrate", catagoryDict), get_csv_param(value_list, "jobinvolvement", catagoryDict), \
+            get_csv_param(value_list, "joblevel", catagoryDict), get_csv_param(value_list, "jobrole", catagoryDict), get_csv_param(value_list, "maritalstatus", catagoryDict), \
+            get_csv_param(value_list, "monthlyrate", catagoryDict), get_csv_param(value_list, "numcompaniesworked", catagoryDict), get_csv_param(value_list, "overtime", catagoryDict), \
+            get_csv_param(value_list, "percentsalaryhike", catagoryDict), get_csv_param(value_list, "relationshipsatisfaction", catagoryDict), get_csv_param(value_list, "standardhours", catagoryDict), \
+            get_csv_param(value_list, "stockoptionlevel", catagoryDict), get_csv_param(value_list, "emptotalworkingyearsloyeenumber", catagoryDict), get_csv_param(value_list, "trainingtimeslastyear", catagoryDict), \
+            get_csv_param(value_list, "worklifebalance", catagoryDict), get_csv_param(value_list, "yearsatcompany", catagoryDict), get_csv_param(value_list, "yearsincurrentrole", catagoryDict), \
+            get_csv_param(value_list, "yearssincelastpromotion", catagoryDict), get_csv_param(value_list, "yearswithcurrmanager", catagoryDict)]
 
 #Reads a csv file #UNFINISHED
 def read_csv(filename):
@@ -135,13 +154,16 @@ def read_csv(filename):
                     catagoryDict[catagory] = i
                 elif catagory == "yearswithcurrentmanager": #In case of CSV file using our SQL scehmatics
                     catagoryDict["yearswithcurrmanager"]=i
+            
             notNullCatagories = ["employeenumber", "age", "businesstravel", "department", "education", "educationfield", "hourlyrate", "joblevel", "jobrole", "monthlyrate"]
             for catagory in notNullCatagories:
                 if catagoryDict[catagory] == None: #If a Not Null field is Null
                     print(f"Missing catagories in CSV file {filename}.")
                     return
+            
             test = next(csvFile) #DEBUG
-            print(check_valid(test))
+            test_input = sort_csv_params(test, catagoryDict)
+            print(check_valid(test_input))
             for lines in csvFile:
                 pass #FINISH
     except FileNotFoundError:
