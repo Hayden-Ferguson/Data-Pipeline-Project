@@ -3,6 +3,7 @@ import csv
 import json
 import sys
 import re
+import os
 from config import load_config
 
 #Returns True if the employees table exists, returns False otherwise
@@ -81,6 +82,41 @@ def fill_database(value_list):
     except (Exception, psycopg2.DatabaseError) as error:
         print(error)
 
+
+"""
+CREATE TABLE employees(
+    employee_number SERIAL PRIMARY KEY, 0
+    age INTEGER NOT NULL CHECK (age > 17),
+    attrition BOOLEAN DEFAULT FALSE,
+    business_travel VARCHAR(20) NOT NULL,
+    department VARCHAR(30) NOT NULL,
+    distance_from_home INTEGER CHECK (distance_from_home > -1), 5
+    education INTEGER NOT NULL CHECK (education > 0 AND education < 6),
+    education_field VARCHAR(30) NOT NULL,
+    environment_satisfaction INTEGER CHECK (environment_satisfaction > 0 AND environment_satisfaction < 6),
+    gender VARCHAR(20),
+    hourly_rate INTEGER NOT NULL CHECK (hourly_rate > 0), 10
+    job_involvement INTEGER CHECK (job_involvement > 0 AND job_involvement < 6),
+    job_level INTEGER NOT NULL CHECK (job_level > 0 AND job_level < 6),
+    job_role VARCHAR(30) NOT NULL,
+    marital_status VARCHAR(10),
+    monthly_rate INTEGER NOT NULL CHECK (monthly_rate > 0), 15
+    num_companies_worked INTEGER CHECK (num_companies_worked > -1),
+    overtime BOOLEAN DEFAULT FALSE,
+    percent_salary_hike INTEGER DEFAULT 0,
+    performance_rating INTEGER CHECK (performance_rating > 0 AND performance_rating < 6),
+    relationship_satisfaction INTEGER CHECK (relationship_satisfaction > 0 AND relationship_satisfaction < 6), 20
+    standard_hours INTEGER DEFAULT 80 CHECK (standard_hours > 0),
+    stock_option_level INTEGER CHECK (stock_option_level > -1),
+    total_working_years INTEGER CHECK (total_working_years > -1),
+    training_times_last_year INTEGER CHECK (training_times_last_year > -1),
+    work_life_balance INTEGER CHECK (work_life_balance > 0 AND work_life_balance < 6), 25
+    years_at_company INTEGER DEFAULT 0 CHECK (years_at_company > -1),
+    years_in_current_role INTEGER DEFAULT 0 CHECK (years_in_current_role > -1),
+    years_since_last_promotion INTEGER DEFAULT 0 CHECK (years_since_last_promotion > -1),
+    years_with_current_manager INTEGER DEFAULT 0 CHECK (years_with_current_manager > -1)
+)
+"""
 #Gets a properly ordered list of values, and checks if it's valid.
 def check_valid(value_list):
     notNullCatagories = [0, 1, 3, 4, 6, 7, 10, 12, 13, 15]
@@ -88,17 +124,33 @@ def check_valid(value_list):
         value = value_list[catagory]
         if value == None or value == "": #assume empty entires in csv means Null
             return False
-    if int(value_list[1]) < 18: #Not an adult
+    
+    if not re.match(r'^[+-]?[0-9]+$', value_list[1]) or int(value_list[1]) < 18: #Not an adult or non-integer
         return False
+    
+    if len(value_list[3])>20: #buisness_travel is too long
+        return False
+    if len(value_list[4])>30: #department is too long
+        return False
+    if len(value_list[7])>30: #education_field is too long
+        return False
+    if len(value_list[9])>20: #buisness_travel is too long
+        return False
+    if len(value_list[13])>30: #job_role is too long
+        return False
+    if len(value_list[14])>10: #marital_status is too long
+        return False
+    
     nonNegativeCatagories = [5, 10, 15, 16, 21, 22, 23, 24, 26, 27, 28, 29]
     for catagory in nonNegativeCatagories: #Field that be a non-negative integer isn't
         value = value_list[catagory]
-        if value[catagory] != None and (not re.match(r'^[+-]?[0-9]+$', value) or int(value) < 0): #not Null and not an integer or negative
+        if value != None and (not re.match(r'^[+-]?[0-9]+$', value) or int(value) < 0): #not Null and not an integer or negative
             return False
+
     gradingCatagories = [6, 8, 11, 12, 19, 20, 25]
     for catagory in gradingCatagories: #Field for 1-5 integer grading has value outside of that.
         value = value_list[catagory]
-        if value[catagory] != None and (not re.match(r'^[+-]?[0-9]+$', value) or int(value) < 1 or int(value > 5)): #not Null and not an integer or outside 1-5 range
+        if value != None and (not re.match(r'^[+-]?[0-9]+$', value) or int(value) < 1 or int(value) > 5): #not Null and not an integer or outside 1-5 range
             return False
     
     return True #Everything checks out
@@ -122,30 +174,29 @@ def get_csv_param(value_list, param, catagoryDict):
 
 #Given a value list and a dictionary of parameters and positions, returns an ordered list of parameters
 def sort_csv_params(value_list, catagoryDict):
-    return [get_csv_param(value_list, "employeenumber", catagoryDict), get_csv_param(value_list, "age", catagoryDict), get_csv_param(value_list, "emplattritionoyeenumber", catagoryDict), \
-            get_csv_param(value_list, "buisnesstravel", catagoryDict), get_csv_param(value_list, "department", catagoryDict), get_csv_param(value_list, "distancefromhome", catagoryDict), \
+    return [get_csv_param(value_list, "employeenumber", catagoryDict), get_csv_param(value_list, "age", catagoryDict), get_csv_param(value_list, "attrition", catagoryDict), \
+            get_csv_param(value_list, "businesstravel", catagoryDict), get_csv_param(value_list, "department", catagoryDict), get_csv_param(value_list, "distancefromhome", catagoryDict), \
             get_csv_param(value_list, "education", catagoryDict), get_csv_param(value_list, "educationfield", catagoryDict), get_csv_param(value_list, "environmentsatisfaction", catagoryDict), \
             get_csv_param(value_list, "gender", catagoryDict), get_csv_param(value_list, "hourlyrate", catagoryDict), get_csv_param(value_list, "jobinvolvement", catagoryDict), \
             get_csv_param(value_list, "joblevel", catagoryDict), get_csv_param(value_list, "jobrole", catagoryDict), get_csv_param(value_list, "maritalstatus", catagoryDict), \
             get_csv_param(value_list, "monthlyrate", catagoryDict), get_csv_param(value_list, "numcompaniesworked", catagoryDict), get_csv_param(value_list, "overtime", catagoryDict), \
-            get_csv_param(value_list, "percentsalaryhike", catagoryDict), get_csv_param(value_list, "relationshipsatisfaction", catagoryDict), get_csv_param(value_list, "standardhours", catagoryDict), \
-            get_csv_param(value_list, "stockoptionlevel", catagoryDict), get_csv_param(value_list, "emptotalworkingyearsloyeenumber", catagoryDict), get_csv_param(value_list, "trainingtimeslastyear", catagoryDict), \
-            get_csv_param(value_list, "worklifebalance", catagoryDict), get_csv_param(value_list, "yearsatcompany", catagoryDict), get_csv_param(value_list, "yearsincurrentrole", catagoryDict), \
-            get_csv_param(value_list, "yearssincelastpromotion", catagoryDict), get_csv_param(value_list, "yearswithcurrmanager", catagoryDict)]
+            get_csv_param(value_list, "percentsalaryhike", catagoryDict), get_csv_param(value_list, "relationshipsatisfaction", catagoryDict), get_csv_param(value_list, "performancerating", catagoryDict),\
+            get_csv_param(value_list, "standardhours", catagoryDict), get_csv_param(value_list, "stockoptionlevel", catagoryDict), get_csv_param(value_list, "totalworkingyears", catagoryDict),\
+            get_csv_param(value_list, "trainingtimeslastyear", catagoryDict), get_csv_param(value_list, "worklifebalance", catagoryDict), get_csv_param(value_list, "yearsatcompany", catagoryDict),\
+            get_csv_param(value_list, "yearsincurrentrole", catagoryDict), get_csv_param(value_list, "yearssincelastpromotion", catagoryDict), get_csv_param(value_list, "yearswithcurrmanager", catagoryDict)]
 
 #Reads a csv file #UNFINISHED
 def read_csv(filename):
     try:
         with open(filename, mode ='r') as file:
             csvFile = csv.reader(file)
-
             #Find catagories from CSV file to match up to SQL table
             #Dictionary standardized to help clean data. yearswithcurrmanager is from original data
             catagoryDict = {"employeenumber": None, "age": None, "attrition": None, "businesstravel": None, "department": None, "distancefromhome": None,\
                         "education": None, "educationfield": None, "environmentsatisfaction": None, "gender": None, "hourlyrate": None, "jobinvolvement": None,\
                         "joblevel": None, "jobrole": None, "maritalstatus": None, "monthlyrate": None, "numcompaniesworked": None, "overtime": None,\
-                        "percentsalaryhike": None, "relationshipsatisfaction": None, "standardhours": None, "stockoptionlevel": None, "totalworkingyears": None,\
-                        "trainingtimeslastyear": None, "worklifebalance": None, "yearsatcompany": None, "yearsincurrentrole": None,\
+                        "percentsalaryhike": None, "performancerating": None, "relationshipsatisfaction": None, "standardhours": None, "stockoptionlevel": None,\
+                        "totalworkingyears": None, "trainingtimeslastyear": None, "worklifebalance": None, "yearsatcompany": None, "yearsincurrentrole": None,\
                         "yearssincelastpromotion": None, "yearswithcurrmanager": None}
             catagories = next(csvFile)
             for i in range(len(catagories)):
@@ -171,7 +222,8 @@ def read_csv(filename):
     except csv.Error as e:
         print(f"Error: Failed to decode csv from the file {filename}: {e}")
     except Exception as e:
-        print(f"Error: The following error occured trying to read csv from {filename}: {e}")
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        print(f"Error: The following error occured trying to read csv from {filename}: {e} on line {exc_tb.tb_lineno}")
 
 #Reads and prints a JSON file
 def read_json(filename):
