@@ -70,7 +70,7 @@ def create_tables():
     except (psycopg2.DatabaseError, Exception) as error:
         print(error)
 
-#Given a list of inputs, replace empty string with None. NOTE: Would set to DEFAULT, but interferes with other functions
+#Given a tuple of inputs, replace empty string with None. NOTE: Would set to DEFAULT, but interferes with other functions
 def filter_inputs(input_list):
     params = len(input_list[0])
     filtered = input_list.copy() #Avoid modifying the original
@@ -251,19 +251,20 @@ def read_csv(filename):
                     return
             
             inputs = []
-            for line in csvFile:
-                sorted = sort_csv_params(line, catagoryDict)
+            for line in csvFile: #Function does not do multiple lines at once do to limits of reading file
+                sorted = sort_csv_params(line, catagoryDict) 
                 inputs.append(sorted)
                 #print(check_valid(sorted))
-            results = check_all_valid(inputs)
+            filtered = filter_inputs(inputs)
+            results = check_all_valid(filtered)
             fill_database(results[0]) #Fill database with valid results
 
-            print("Valid:")
-            for valid in results[0]:
-                print(valid)
-            print("Invalid:")
-            for invalid in results[1]:
-                print(invalid)
+            #print("Valid:")
+            #for valid in results[0]:
+            #    print(valid)
+            #print("Invalid:")
+            #for invalid in results[1]:
+            #    print(invalid)
     except FileNotFoundError:
         print(f"Error: The file {filename} could not be found.")
     except csv.Error as e:
