@@ -22,7 +22,8 @@ def create_tables():
     command = ( #Command to create table. More standardized names.
         #SERIAL PRIMARY KEY might cause new emplyees to be skipped if they use default SERIAL number. 
         #over_18, daily_rate, monthly_income, and employee_count removed. years_with_curr_manager became years_with_current_manager
-        #assume people who do not have all field filled out are new employees
+        #assume people who do not have all fields filled out are new employees
+        #NOTE: Currently inserting Null into fields with DEFAULT
         """
         CREATE TABLE employees(
             employee_number SERIAL PRIMARY KEY,
@@ -69,18 +70,26 @@ def create_tables():
     except (psycopg2.DatabaseError, Exception) as error:
         print(error)
 
-#Fills database with values (Currently empty)
-def fill_database(value_list):
-    sql = "INSERT INTO placeholder(value) VALUES(%s) RETURNING *" #Change when database details decided
+#Fills database with values given a list of inputs that contain ordered parameters
+def fill_database(input_list):
+    sql = "INSERT INTO employees(employee_number, age, attrition, business_travel, department, distance_from_home," \
+    "education, education_field, environment_satisfaction, gender, hourly_rate, job_involvement, job_level," \
+    "job_role, marital_status, monthly_rate, num_companies_worked, overtime, percent_salary_hike, performance_rating," \
+    "relationship_satisfaction, standard_hours, stock_option_level, total_working_years, training_times_last_year," \
+    "work_life_balance, years_at_company, years_in_current_role, years_since_last_promotion, years_with_current_manager) " \
+    "VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
     config = load_config()
     try:
         with  psycopg2.connect(**config) as conn:
             with  conn.cursor() as cur:
-                cur.executemany(sql, value_list)
+                #print(len(input_list[0]))
+                cur.executemany(sql, input_list)
 
             conn.commit()
+            print(f"Employee table updated with {cur.rowcount} rows")
     except (Exception, psycopg2.DatabaseError) as error:
-        print(error)
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        print(f"Error: The following error occured trying to insert into the database: {error} on line {exc_tb.tb_lineno}")
 
 
 """
@@ -165,17 +174,19 @@ def check_all_valid(inputs):
         with  psycopg2.connect(**config) as conn:
             with  conn.cursor() as cur:
                 cur.execute("SELECT employee_number FROM employees") #Get the primary keys
-                primary_keys = set(cur.fetchall()) #get primary keys and turn them into set for efficient look-up
+                
+                primary_keys = set(cur.fetchall()) #get primary keys and turn them into set for efficient look-up. Stored as (int, )
                 existing_primary_keys = set()
                 for input in inputs:
-                    if check_valid(input) and input[0] not in primary_keys and input[0] not in existing_primary_keys: #Not valid if primary keys already in database or valid.
+                    #Not valid if primary keys already in database or valid.
+                    if check_valid(input) and (int(input[0]),) not in primary_keys and input[0] not in existing_primary_keys:
                         valid.append(input)
-                        existing_primary_keys.add(input[0])
+                        existing_primary_keys.add(input[0]) #shouldn't matter it's a string if we keep comparing input[0]
                     else:
                         invalid.append(input)
                 return (tuple(valid), tuple(invalid))
 
-            conn.commit()
+            conn.commit() #NOTE: Pretty sure this is unneeded
     except (Exception, psycopg2.DatabaseError) as error:
         print(error)
 
@@ -236,12 +247,14 @@ def read_csv(filename):
                 inputs.append(sorted)
                 #print(check_valid(sorted))
             results = check_all_valid(inputs)
-            print("Valid:")
-            for valid in results[0]:
-                print(valid)
-            print("Invalid:")
-            for invalid in results[1]:
-                print(invalid)
+            fill_database(results[0]) #Fill database with valid results
+            #print("Valid:")
+            #for valid in results[0]:
+            #    print(valid)
+            #print("Invalid:")
+            #for invalid in results[1]:
+            #    print(invalid)
+            print(f"")
     except FileNotFoundError:
         print(f"Error: The file {filename} could not be found.")
     except csv.Error as e:
