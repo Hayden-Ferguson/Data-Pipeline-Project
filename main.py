@@ -4,6 +4,7 @@ import json
 import sys
 import re
 import os
+from datetime import datetime
 from config import load_config
 
 #Returns True if the employees table exists, returns False otherwise
@@ -80,7 +81,7 @@ def filter_inputs(input_list):
                 filtered[i][j] = None #Set it to none
     return filtered
 
-#Fills database with values given a list of inputs that contain ordered parameters
+#Fills database with values given a list of inputs that contain ordered parameters NOTE: Modify to batch UPSERT
 def fill_database(input_list):
     sql = "INSERT INTO employees(employee_number, age, attrition, business_travel, department, distance_from_home," \
     "education, education_field, environment_satisfaction, gender, hourly_rate, job_involvement, job_level," \
@@ -175,6 +176,7 @@ def check_valid(value_list):
     return True #Everything checks out
 
 #Gets a list of ordered inputs, returns a tuple of a list of valid and non-valid inputs. Does check primary keys.
+#NOTE: modify to not care if it's already in the database
 def check_all_valid(inputs):
     valid = []
     invalid = []
@@ -223,7 +225,15 @@ def sort_csv_params(value_list, catagoryDict):
             get_csv_param(value_list, "yearsatcompany", catagoryDict), get_csv_param(value_list, "yearsincurrentrole", catagoryDict),\
             get_csv_param(value_list, "yearssincelastpromotion", catagoryDict), get_csv_param(value_list, "yearswithcurrmanager", catagoryDict)]
 
-#Reads a csv file #UNFINISHED
+#Start a new logger session given source, number of rows from source, and path to source
+#NOTE: modify this once we have YAML configuration to not need source and path
+def log_start(source, rows, path):
+    with open("logger.txt", "a") as logger:
+        logger.write(f"\n-----{datetime.now()}-----\n")
+        logger.write(f"INFO ingest.start source={source} rows={rows} path={path}\n")
+
+
+#Reads a csv file
 def read_csv(filename):
     try: #FUTURE: Could probably make things way more efficient with pandas
         with open(filename, mode ='r') as file:
@@ -247,7 +257,7 @@ def read_csv(filename):
             notNullCatagories = ["employeenumber", "age", "businesstravel", "department", "education", "educationfield", "hourlyrate", "joblevel", "jobrole", "monthlyrate"]
             for catagory in notNullCatagories:
                 if catagoryDict[catagory] == None: #If a Not Null field is Null
-                    print(f"Missing catagories in CSV file {filename}.")
+                    print(f"Missing non-Null catagories in CSV file {filename}.")
                     return
             
             inputs = []
@@ -255,6 +265,7 @@ def read_csv(filename):
                 sorted = sort_csv_params(line, catagoryDict) 
                 inputs.append(sorted)
                 #print(check_valid(sorted))
+            log_start(filename, len(inputs), filename)
             filtered = filter_inputs(inputs)
             results = check_all_valid(filtered)
             fill_database(results[0]) #Fill database with valid results
