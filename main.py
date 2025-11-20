@@ -166,9 +166,11 @@ def check_all_valid(inputs):
             with  conn.cursor() as cur:
                 cur.execute("SELECT employee_number FROM employees") #Get the primary keys
                 primary_keys = set(cur.fetchall()) #get primary keys and turn them into set for efficient look-up
+                existing_primary_keys = set()
                 for input in inputs:
-                    if check_valid(input) and input[0] not in primary_keys:
+                    if check_valid(input) and input[0] not in primary_keys and input[0] not in existing_primary_keys: #Not valid if primary keys already in database or valid.
                         valid.append(input)
+                        existing_primary_keys.add(input[0])
                     else:
                         invalid.append(input)
                 return (tuple(valid), tuple(invalid))
@@ -185,16 +187,21 @@ def get_csv_param(value_list, param, catagoryDict):
 
 #Given a value list and a dictionary of parameters and positions, returns an ordered list of parameters
 def sort_csv_params(value_list, catagoryDict):
-    return [get_csv_param(value_list, "employeenumber", catagoryDict), get_csv_param(value_list, "age", catagoryDict), get_csv_param(value_list, "attrition", catagoryDict), \
-            get_csv_param(value_list, "businesstravel", catagoryDict), get_csv_param(value_list, "department", catagoryDict), get_csv_param(value_list, "distancefromhome", catagoryDict), \
-            get_csv_param(value_list, "education", catagoryDict), get_csv_param(value_list, "educationfield", catagoryDict), get_csv_param(value_list, "environmentsatisfaction", catagoryDict), \
-            get_csv_param(value_list, "gender", catagoryDict), get_csv_param(value_list, "hourlyrate", catagoryDict), get_csv_param(value_list, "jobinvolvement", catagoryDict), \
-            get_csv_param(value_list, "joblevel", catagoryDict), get_csv_param(value_list, "jobrole", catagoryDict), get_csv_param(value_list, "maritalstatus", catagoryDict), \
-            get_csv_param(value_list, "monthlyrate", catagoryDict), get_csv_param(value_list, "numcompaniesworked", catagoryDict), get_csv_param(value_list, "overtime", catagoryDict), \
-            get_csv_param(value_list, "percentsalaryhike", catagoryDict), get_csv_param(value_list, "relationshipsatisfaction", catagoryDict), get_csv_param(value_list, "performancerating", catagoryDict),\
-            get_csv_param(value_list, "standardhours", catagoryDict), get_csv_param(value_list, "stockoptionlevel", catagoryDict), get_csv_param(value_list, "totalworkingyears", catagoryDict),\
-            get_csv_param(value_list, "trainingtimeslastyear", catagoryDict), get_csv_param(value_list, "worklifebalance", catagoryDict), get_csv_param(value_list, "yearsatcompany", catagoryDict),\
-            get_csv_param(value_list, "yearsincurrentrole", catagoryDict), get_csv_param(value_list, "yearssincelastpromotion", catagoryDict), get_csv_param(value_list, "yearswithcurrmanager", catagoryDict)]
+    return [get_csv_param(value_list, "employeenumber", catagoryDict), get_csv_param(value_list, "age", catagoryDict),\
+            get_csv_param(value_list, "attrition", catagoryDict), get_csv_param(value_list, "businesstravel", catagoryDict),\
+            get_csv_param(value_list, "department", catagoryDict), get_csv_param(value_list, "distancefromhome", catagoryDict), \
+            get_csv_param(value_list, "education", catagoryDict), get_csv_param(value_list, "educationfield", catagoryDict),\
+            get_csv_param(value_list, "environmentsatisfaction", catagoryDict), get_csv_param(value_list, "gender", catagoryDict),\
+            get_csv_param(value_list, "hourlyrate", catagoryDict), get_csv_param(value_list, "jobinvolvement", catagoryDict), \
+            get_csv_param(value_list, "joblevel", catagoryDict), get_csv_param(value_list, "jobrole", catagoryDict),\
+            get_csv_param(value_list, "maritalstatus", catagoryDict), get_csv_param(value_list, "monthlyrate", catagoryDict),\
+            get_csv_param(value_list, "numcompaniesworked", catagoryDict), get_csv_param(value_list, "overtime", catagoryDict), \
+            get_csv_param(value_list, "percentsalaryhike", catagoryDict), get_csv_param(value_list, "relationshipsatisfaction", catagoryDict),\
+            get_csv_param(value_list, "performancerating", catagoryDict), get_csv_param(value_list, "standardhours", catagoryDict),\
+            get_csv_param(value_list, "stockoptionlevel", catagoryDict), get_csv_param(value_list, "totalworkingyears", catagoryDict),\
+            get_csv_param(value_list, "trainingtimeslastyear", catagoryDict), get_csv_param(value_list, "worklifebalance", catagoryDict),\
+            get_csv_param(value_list, "yearsatcompany", catagoryDict), get_csv_param(value_list, "yearsincurrentrole", catagoryDict),\
+            get_csv_param(value_list, "yearssincelastpromotion", catagoryDict), get_csv_param(value_list, "yearswithcurrmanager", catagoryDict)]
 
 #Reads a csv file #UNFINISHED
 def read_csv(filename):
@@ -229,8 +236,12 @@ def read_csv(filename):
                 inputs.append(sorted)
                 #print(check_valid(sorted))
             results = check_all_valid(inputs)
-            #print(results[0])
-            #print(results[1])
+            print("Valid:")
+            for valid in results[0]:
+                print(valid)
+            print("Invalid:")
+            for invalid in results[1]:
+                print(invalid)
     except FileNotFoundError:
         print(f"Error: The file {filename} could not be found.")
     except csv.Error as e:
