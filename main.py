@@ -70,7 +70,7 @@ def create_tables():
     except (psycopg2.DatabaseError, Exception) as error:
         print(error)
 
-#Given a tuple of inputs, replace empty string with None. NOTE: Would set to DEFAULT, but interferes with other functions
+#Given a tuple of inputs, replace empty string with None. NOTE: Would set to DEFAULT with sql.SQL("DEFAULT"), but interferes with other functions.
 def filter_inputs(input_list):
     params = len(input_list[0])
     filtered = input_list.copy() #Avoid modifying the original
@@ -174,7 +174,7 @@ def check_valid(value_list):
     
     return True #Everything checks out
 
-#Gets a list of ordered inputs, returns a tuple of a list of valid and non-valid inputs
+#Gets a list of ordered inputs, returns a tuple of a list of valid and non-valid inputs. Does check primary keys.
 def check_all_valid(inputs):
     valid = []
     invalid = []
@@ -239,7 +239,7 @@ def read_csv(filename):
             catagories = next(csvFile)
             for i in range(len(catagories)):
                 catagory = re.sub(r'[^a-zA-Z]', '', catagories[i]).lower()
-                if re.sub(r'[^a-zA-Z]', '', catagories[i]).lower() in catagoryDict.keys(): #remove capitalization and non-letters
+                if catagory in catagoryDict.keys(): #remove capitalization and non-letters
                     catagoryDict[catagory] = i
                 elif catagory == "yearswithcurrentmanager": #In case of CSV file using our SQL scehmatics
                     catagoryDict["yearswithcurrmanager"]=i
@@ -302,6 +302,21 @@ def drop_tables():
     except (psycopg2.DatabaseError, Exception) as e:
         print(f"Failed to drop table Employees: {e}")
 
+#Reads the table and prints it line by line
+def read_table():
+    config = load_config()
+    try:
+        with  psycopg2.connect(**config) as conn:
+            with  conn.cursor() as cur:
+                cur.execute("SELECT * FROM employees")
+                rows = cur.fetchall()
+                for row in rows:
+                    print(row)
+
+    except (Exception, psycopg2.DatabaseError) as error:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        print(f"Error: The following error occured trying to read the database: {error} on line {exc_tb.tb_lineno}")
+
 #Takes a list of commands and performs them, reading any csv or json files given
 def read_commands(commands):
     for command in commands:
@@ -309,8 +324,10 @@ def read_commands(commands):
             read_csv(command)
         elif command.endswith(".json"):
             read_json(command)
-        elif command == "drop":
+        elif command.lower() == "drop":
             drop_tables()
+        elif command.lower() == "read":
+            read_table()
         else:
             print("Invalid command/file")
 
