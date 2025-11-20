@@ -1,3 +1,7 @@
 -----2025-11-20 15:52:03.721589-----INFO ingest.start source=.\HR-Employee-Attrition.csv rows=1470 path=.\HR-Employee-Attrition.csv
 -----2025-11-20 15:52:41.391462-----
 INFO ingest.start source=.\HR-Employee-Attrition.csv rows=1470 path=.\HR-Employee-Attrition.csv
+
+-----2025-11-20 15:55:41.489346-----
+INFO ingest.start source=.\HR-Employee-Attrition.csv rows=1470 path=.\HR-Employee-Attrition.csv
+INFO ingest.validate source=.\HR-Employee-Attrition.csv valid=0 invalid=1470

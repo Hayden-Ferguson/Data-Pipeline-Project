@@ -232,6 +232,11 @@ def log_start(source, rows, path):
         logger.write(f"\n-----{datetime.now()}-----\n")
         logger.write(f"INFO ingest.start source={source} rows={rows} path={path}\n")
 
+#Log the results of data validation given source and the results
+def log_validation(source, results):
+    with open("logger.txt", "a") as logger:
+        logger.write(f"INFO ingest.validate source={source} valid={len(results[0])} invalid={len(results[1])}\n")
+
 
 #Reads a csv file
 def read_csv(filename):
@@ -268,6 +273,7 @@ def read_csv(filename):
             log_start(filename, len(inputs), filename)
             filtered = filter_inputs(inputs)
             results = check_all_valid(filtered)
+            log_validation(filename, results)
             fill_database(results[0]) #Fill database with valid results
 
             #print("Valid:")
