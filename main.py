@@ -70,6 +70,16 @@ def create_tables():
     except (psycopg2.DatabaseError, Exception) as error:
         print(error)
 
+#Given a list of inputs, replace empty string with None. NOTE: Would set to DEFAULT, but interferes with other functions
+def filter_inputs(input_list):
+    params = len(input_list[0])
+    filtered = input_list.copy() #Avoid modifying the original
+    for i in range(len(input_list)):
+        for j in range(params):
+            if input_list[i][j] == "": #If a parameter is an empty string
+                filtered[i][j] = None #Set it to none
+    return filtered
+
 #Fills database with values given a list of inputs that contain ordered parameters
 def fill_database(input_list):
     sql = "INSERT INTO employees(employee_number, age, attrition, business_travel, department, distance_from_home," \
@@ -82,7 +92,6 @@ def fill_database(input_list):
     try:
         with  psycopg2.connect(**config) as conn:
             with  conn.cursor() as cur:
-                #print(len(input_list[0]))
                 cur.executemany(sql, input_list)
 
             conn.commit()
@@ -248,13 +257,13 @@ def read_csv(filename):
                 #print(check_valid(sorted))
             results = check_all_valid(inputs)
             fill_database(results[0]) #Fill database with valid results
-            #print("Valid:")
-            #for valid in results[0]:
-            #    print(valid)
-            #print("Invalid:")
-            #for invalid in results[1]:
-            #    print(invalid)
-            print(f"")
+
+            print("Valid:")
+            for valid in results[0]:
+                print(valid)
+            print("Invalid:")
+            for invalid in results[1]:
+                print(invalid)
     except FileNotFoundError:
         print(f"Error: The file {filename} could not be found.")
     except csv.Error as e:
