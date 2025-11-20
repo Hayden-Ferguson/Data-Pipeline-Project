@@ -1,0 +1,9 @@
+Nothing
+age is non-integer
+business_travel is empty
+business_travel is above length 20
+Nothing (age is 18)
+Underage
+Negative distance_from_home
+job_involvement of 6
+job_involvement of 0

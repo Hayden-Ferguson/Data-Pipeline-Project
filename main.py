@@ -84,7 +84,8 @@ def fill_database(value_list):
 
 
 """
-CREATE TABLE employees(
+For reference:
+TABLE employees(
     employee_number SERIAL PRIMARY KEY, 0
     age INTEGER NOT NULL CHECK (age > 17),
     attrition BOOLEAN DEFAULT FALSE,
@@ -117,7 +118,7 @@ CREATE TABLE employees(
     years_with_current_manager INTEGER DEFAULT 0 CHECK (years_with_current_manager > -1)
 )
 """
-#Gets a properly ordered list of values, and checks if it's valid.
+#Gets a properly ordered list of values, and checks if it's valid. NOTE: Does not check if primary key is in use for efficiency sake
 def check_valid(value_list):
     notNullCatagories = [0, 1, 3, 4, 6, 7, 10, 12, 13, 15]
     for catagory in notNullCatagories: #Not null field is null
@@ -142,9 +143,9 @@ def check_valid(value_list):
         return False
     
     nonNegativeCatagories = [5, 10, 15, 16, 21, 22, 23, 24, 26, 27, 28, 29]
-    for catagory in nonNegativeCatagories: #Field that be a non-negative integer isn't
+    for catagory in nonNegativeCatagories: #Field that should be a non-negative integer isn't
         value = value_list[catagory]
-        if value != None and (not re.match(r'^[+-]?[0-9]+$', value) or int(value) < 0): #not Null and not an integer or negative
+        if value != None and ((not re.match(r'^[+-]?[0-9]+$', value)) or int(value) < 0): #not Null and not an integer or negative
             return False
 
     gradingCatagories = [6, 8, 11, 12, 19, 20, 25]
@@ -159,12 +160,22 @@ def check_valid(value_list):
 def check_all_valid(inputs):
     valid = []
     invalid = []
-    for input in inputs:
-        if check_valid(input):
-            valid.append(input)
-        else:
-            invalid.append(input)
-    return (tuple(valid), tuple(invalid))
+    config = load_config()
+    try:
+        with  psycopg2.connect(**config) as conn:
+            with  conn.cursor() as cur:
+                cur.execute("SELECT employee_number FROM employees") #Get the primary keys
+                primary_keys = set(cur.fetchall()) #get primary keys and turn them into set for efficient look-up
+                for input in inputs:
+                    if check_valid(input) and input[0] not in primary_keys:
+                        valid.append(input)
+                    else:
+                        invalid.append(input)
+                return (tuple(valid), tuple(invalid))
+
+            conn.commit()
+    except (Exception, psycopg2.DatabaseError) as error:
+        print(error)
 
 #given a list of values, the desired parameter, and a dictionary of parameters and positions, return the desired parameter
 def get_csv_param(value_list, param, catagoryDict):
@@ -187,7 +198,7 @@ def sort_csv_params(value_list, catagoryDict):
 
 #Reads a csv file #UNFINISHED
 def read_csv(filename):
-    try:
+    try: #FUTURE: Could probably make things way more efficient with pandas
         with open(filename, mode ='r') as file:
             csvFile = csv.reader(file)
             #Find catagories from CSV file to match up to SQL table
@@ -212,11 +223,14 @@ def read_csv(filename):
                     print(f"Missing catagories in CSV file {filename}.")
                     return
             
-            test = next(csvFile) #DEBUG
-            test_input = sort_csv_params(test, catagoryDict)
-            print(check_valid(test_input))
-            for lines in csvFile:
-                pass #FINISH
+            inputs = []
+            for line in csvFile:
+                sorted = sort_csv_params(line, catagoryDict)
+                inputs.append(sorted)
+                #print(check_valid(sorted))
+            results = check_all_valid(inputs)
+            #print(results[0])
+            #print(results[1])
     except FileNotFoundError:
         print(f"Error: The file {filename} could not be found.")
     except csv.Error as e:
