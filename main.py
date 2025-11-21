@@ -238,10 +238,15 @@ def log_validation(source, results):
         logger.write(f"INFO ingest.validate source={source} valid={len(results[0])} invalid={len(results[1])}\n")
 
 #Log the results of inserting data given source, the inserted rows, and the start time
-def log_insert(source, rows, start):
+def log_insert(source, rows, start): #NOTE: Change it so that it counts inserted and updated rows when possible
     timer = (datetime.now() - start).total_seconds()
     with open("logger.txt", "a") as logger:
         logger.write(f"INFO ingest.load source={source} inserted={len(rows)} duration={timer}s\n")
+
+#Finishes log given source and status, which is presumed to be success
+def log_end(source, status="success"):
+    with open("logger.txt", "a") as logger:
+        logger.write(f"INFO ingest.end source={source} status={status}\n")
 
 #Reads a csv file
 def read_csv(filename):
@@ -282,6 +287,7 @@ def read_csv(filename):
             start = datetime.now()
             fill_database(results[0]) #Fill database with valid results
             log_insert(filename, results[0], start)
+            log_end(filename)
 
             #print("Valid:")
             #for valid in results[0]:
