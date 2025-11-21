@@ -7,6 +7,13 @@ import os
 from datetime import datetime
 from config import load_config
 
+#List of catagories for reference
+catagoryList=["employee_number", "age", "attrition", "business_travel", "department", "distance_from_home", \
+    "education", "education_field", "environment_satisfaction", "gender", "hourly_rate", "job_involvement", "job_level", \
+    "job_role", "marital_status", "monthly_rate", "num_companies_worked", "overtime", "percent_salary_hike", "performance_rating", \
+    "relationship_satisfaction", "standard_hours", "stock_option_level", "total_working_years", "training_times_last_year", \
+    "work_life_balance", "years_at_company", "years_in_current_role", "years_since_last_promotion", "years_with_current_manager"]
+
 #Returns True if the employees table exists, returns False otherwise
 def table_exists():
     try:
@@ -143,37 +150,37 @@ def check_valid(value_list):
     for catagory in notNullCatagories: #Not null field is null
         value = value_list[catagory]
         if value == None or value == "": #assume empty entires in csv means Null
-            return False
+            return (False, f"{catagoryList[catagory]} is Null")
     
     if not re.match(r'^[+-]?[0-9]+$', value_list[1]) or int(value_list[1]) < 18: #Not an adult or non-integer
-        return False
+        return (False, f"age is {value_list}, which is below 18 or not an integer")
     
     if len(value_list[3])>20: #buisness_travel is too long
-        return False
+        return (False, f"buisness_travel is {value_list[3]}, which is too long")
     if len(value_list[4])>30: #department is too long
-        return False
+        return (False, f"department is {value_list[4]}, which is too long")
     if len(value_list[7])>30: #education_field is too long
-        return False
-    if len(value_list[9])>20: #buisness_travel is too long
-        return False
+        return (False, f"education_field is {value_list[7]}, which is too long")
+    if len(value_list[9])>20: #gender is too long
+        return (False, f"gender is {value_list[9]}, which is too long")
     if len(value_list[13])>30: #job_role is too long
-        return False
+        return (False, f"job_role is {value_list[13]}, which is too long")
     if len(value_list[14])>10: #marital_status is too long
-        return False
+        return (False, f"marital_status is {value_list[14]}, which is too long")
     
     nonNegativeCatagories = [5, 10, 15, 16, 21, 22, 23, 24, 26, 27, 28, 29]
     for catagory in nonNegativeCatagories: #Field that should be a non-negative integer isn't
         value = value_list[catagory]
         if value != None and ((not re.match(r'^[+-]?[0-9]+$', value)) or int(value) < 0): #not Null and not an integer or negative
-            return False
+            return (False, f"{catagoryList} is {value}, which is either negative or not an integer")
 
     gradingCatagories = [6, 8, 11, 12, 19, 20, 25]
     for catagory in gradingCatagories: #Field for 1-5 integer grading has value outside of that.
         value = value_list[catagory]
         if value != None and (not re.match(r'^[+-]?[0-9]+$', value) or int(value) < 1 or int(value) > 5): #not Null and not an integer or outside 1-5 range
-            return False
+            return (False, f"{catagoryList[catagory]} is {value}, which is outside of the 1-5 range or not an integer")
     
-    return True #Everything checks out
+    return (True, "Duplicate primary key") #Everything checks out
 
 #Gets a list of ordered inputs, returns a tuple of a list of valid and non-valid inputs. Does check primary keys.
 #NOTE: modify to not care if it's already in the database
@@ -190,16 +197,18 @@ def check_all_valid(inputs):
                 existing_primary_keys = set()
                 for input in inputs:
                     #Not valid if primary keys already in database or valid.
-                    if check_valid(input) and (int(input[0]),) not in primary_keys and input[0] not in existing_primary_keys:
+                    validity = check_valid(input)
+                    if validity[0] and (int(input[0]),) not in primary_keys and input[0] not in existing_primary_keys:
                         valid.append(input)
                         existing_primary_keys.add(input[0]) #shouldn't matter it's a string if we keep comparing input[0]
                     else:
-                        invalid.append(input)
+                        invalid.append((input, validity[1]))
                 return (tuple(valid), tuple(invalid))
 
             conn.commit() #NOTE: Pretty sure this is unneeded
     except (Exception, psycopg2.DatabaseError) as error:
-        print(error)
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        print(f"Error: The following error occured trying check validity of inputs: {error} on line {exc_tb.tb_lineno}")
 
 #given a list of values, the desired parameter, and a dictionary of parameters and positions, return the desired parameter
 def get_csv_param(value_list, param, catagoryDict):

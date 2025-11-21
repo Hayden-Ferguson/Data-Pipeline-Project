@@ -1,32 +1,5 @@
------2025-11-20 15:52:03.721589-----INFO ingest.start source=.\HR-Employee-Attrition.csv rows=1470 path=.\HR-Employee-Attrition.csv
------2025-11-20 15:52:41.391462-----
-INFO ingest.start source=.\HR-Employee-Attrition.csv rows=1470 path=.\HR-Employee-Attrition.csv
-
------2025-11-20 15:55:41.489346-----
-INFO ingest.start source=.\HR-Employee-Attrition.csv rows=1470 path=.\HR-Employee-Attrition.csv
-INFO ingest.validate source=.\HR-Employee-Attrition.csv valid=0 invalid=1470
-
------2025-11-21 14:46:29.500581-----
-INFO ingest.start source=.\HR-Employee-Attrition.csv rows=1470 path=.\HR-Employee-Attrition.csv
-INFO ingest.validate source=.\HR-Employee-Attrition.csv valid=1470 invalid=0
-
------2025-11-21 14:47:00.002730-----
-INFO ingest.start source=.\HR-Employee-Attrition.csv rows=1470 path=.\HR-Employee-Attrition.csv
-INFO ingest.validate source=.\HR-Employee-Attrition.csv valid=1470 invalid=0
-INFO ingest.load source=.\HR-Employee-Attrition.csv inserted=1470 duration=0:00:00.274799
-
------2025-11-21 14:49:15.341004-----
-INFO ingest.start source=.\HR-Employee-Attrition.csv rows=1470 path=.\HR-Employee-Attrition.csv
-INFO ingest.validate source=.\HR-Employee-Attrition.csv valid=0 invalid=1470
-INFO ingest.load source=.\HR-Employee-Attrition.csv inserted=0 duration=0.103281
-
------2025-11-21 14:49:19.749937-----
-INFO ingest.start source=.\HR-Employee-Attrition.csv rows=1470 path=.\HR-Employee-Attrition.csv
-INFO ingest.validate source=.\HR-Employee-Attrition.csv valid=1470 invalid=0
-INFO ingest.load source=.\HR-Employee-Attrition.csv inserted=1470 duration=0.271989
-
------2025-11-21 14:55:42.984348-----
-INFO ingest.start source=.\HR-Employee-Attrition.csv rows=1470 path=.\HR-Employee-Attrition.csv
-INFO ingest.validate source=.\HR-Employee-Attrition.csv valid=0 invalid=1470
-INFO ingest.load source=.\HR-Employee-Attrition.csv inserted=0 duration=0.120967s
-INFO ingest.end source=.\HR-Employee-Attrition.csv status=success
+-----2025-11-21 15:13:37.823948-----
+INFO ingest.start source=.\Wrong.csv rows=11 path=.\Wrong.csv
+INFO ingest.validate source=.\Wrong.csv valid=3 invalid=8
+INFO ingest.load source=.\Wrong.csv inserted=3 duration=0.102125s
+INFO ingest.end source=.\Wrong.csv status=success
