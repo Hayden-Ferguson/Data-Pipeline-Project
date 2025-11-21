@@ -237,10 +237,15 @@ def log_validation(source, results):
     with open("logger.txt", "a") as logger:
         logger.write(f"INFO ingest.validate source={source} valid={len(results[0])} invalid={len(results[1])}\n")
 
+#Log the results of inserting data given source, the inserted rows, and the start time
+def log_insert(source, rows, start):
+    timer = (datetime.now() - start).total_seconds()
+    with open("logger.txt", "a") as logger:
+        logger.write(f"INFO ingest.load source={source} inserted={len(rows)} duration={timer}s\n")
 
 #Reads a csv file
 def read_csv(filename):
-    try: #FUTURE: Could probably make things way more efficient with pandas
+    try: #NOTE: Could probably make things way more efficient with pandas
         with open(filename, mode ='r') as file:
             csvFile = csv.reader(file)
             #Find catagories from CSV file to match up to SQL table
@@ -274,7 +279,9 @@ def read_csv(filename):
             filtered = filter_inputs(inputs)
             results = check_all_valid(filtered)
             log_validation(filename, results)
+            start = datetime.now()
             fill_database(results[0]) #Fill database with valid results
+            log_insert(filename, results[0], start)
 
             #print("Valid:")
             #for valid in results[0]:
