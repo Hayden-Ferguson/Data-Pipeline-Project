@@ -3,3 +3,27 @@ INFO ingest.start source=.\Wrong.csv rows=11 path=.\Wrong.csv
 INFO ingest.validate source=.\Wrong.csv valid=3 invalid=8
 INFO ingest.load source=.\Wrong.csv inserted=3 duration=0.102125s
 INFO ingest.end source=.\Wrong.csv status=success
+
+-----2025-11-21 15:23:33.573342-----
+INFO ingest.start source=.\Wrong.csv rows=11 path=.\Wrong.csv
+INFO ingest.validate source=.\Wrong.csv valid=3 invalid=8
+INFO ingest.load source=.\Wrong.csv inserted=3 duration=0.095413s
+INFO ingest.end source=.\Wrong.csv status=success
+
+-----2025-11-21 15:24:58.253604-----
+INFO ingest.start source=.\Wrong.csv rows=11 path=.\Wrong.csv
+INFO ingest.validate source=.\Wrong.csv valid=3 invalid=8
+INFO ingest.load source=.\Wrong.csv inserted=3 duration=0.22831s
+INFO ingest.end source=.\Wrong.csv status=success
+
+-----2025-11-21 15:26:23.784795-----
+INFO ingest.start source=.\Wrong.csv rows=11 path=.\Wrong.csv
+INFO ingest.validate source=.\Wrong.csv valid=3 invalid=8
+INFO ingest.load source=.\Wrong.csv inserted=3 duration=0.10999s
+INFO ingest.end source=.\Wrong.csv status=success
+
+-----2025-11-21 15:27:21.890913-----
+INFO ingest.start source=.\Wrong.csv rows=11 path=.\Wrong.csv
+INFO ingest.validate source=.\Wrong.csv valid=3 invalid=8
+INFO ingest.load source=.\Wrong.csv inserted=3 duration=0.111403s
+INFO ingest.end source=.\Wrong.csv status=success

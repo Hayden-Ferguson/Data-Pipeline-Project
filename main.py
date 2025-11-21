@@ -153,7 +153,7 @@ def check_valid(value_list):
             return (False, f"{catagoryList[catagory]} is Null")
     
     if not re.match(r'^[+-]?[0-9]+$', value_list[1]) or int(value_list[1]) < 18: #Not an adult or non-integer
-        return (False, f"age is {value_list}, which is below 18 or not an integer")
+        return (False, f"age is {value_list[1]}, which is below 18 or not an integer")
     
     if len(value_list[3])>20: #buisness_travel is too long
         return (False, f"buisness_travel is {value_list[3]}, which is too long")
@@ -172,7 +172,7 @@ def check_valid(value_list):
     for catagory in nonNegativeCatagories: #Field that should be a non-negative integer isn't
         value = value_list[catagory]
         if value != None and ((not re.match(r'^[+-]?[0-9]+$', value)) or int(value) < 0): #not Null and not an integer or negative
-            return (False, f"{catagoryList} is {value}, which is either negative or not an integer")
+            return (False, f"{catagoryList[catagory]} is {value}, which is either negative or not an integer")
 
     gradingCatagories = [6, 8, 11, 12, 19, 20, 25]
     for catagory in gradingCatagories: #Field for 1-5 integer grading has value outside of that.
@@ -257,6 +257,14 @@ def log_end(source, status="success"):
     with open("logger.txt", "a") as logger:
         logger.write(f"INFO ingest.end source={source} status={status}\n")
 
+#Logs rejected data with reasons 
+#NOTE: if possible change to a reject SQL table
+def log_rejects(rejections):
+    with open("rejection_log.txt", "a") as logger:
+        logger.write(f"\n-----{datetime.now()}-----\n")
+        for reject in rejections:
+            logger.write(f"{reject[0]}\nreason: {reject[1]}\n")
+
 #Reads a csv file
 def read_csv(filename):
     try: #NOTE: Could probably make things way more efficient with pandas
@@ -293,6 +301,7 @@ def read_csv(filename):
             filtered = filter_inputs(inputs)
             results = check_all_valid(filtered)
             log_validation(filename, results)
+            log_rejects(results[1])
             start = datetime.now()
             fill_database(results[0]) #Fill database with valid results
             log_insert(filename, results[0], start)
