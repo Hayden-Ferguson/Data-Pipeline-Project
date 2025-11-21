@@ -27,3 +27,13 @@ INFO ingest.start source=.\Wrong.csv rows=11 path=.\Wrong.csv
 INFO ingest.validate source=.\Wrong.csv valid=3 invalid=8
 INFO ingest.load source=.\Wrong.csv inserted=3 duration=0.111403s
 INFO ingest.end source=.\Wrong.csv status=success
+
+employees table dropped at 2025-11-21 15:38:10.118563
+
+employees table created at 2025-11-21 15:38:15.847481
+
+-----2025-11-21 15:38:15.847481-----
+INFO ingest.start source=.\Wrong.csv rows=11 path=.\Wrong.csv
+INFO ingest.validate source=.\Wrong.csv valid=3 invalid=8
+INFO ingest.load source=.\Wrong.csv inserted=3 duration=0.098955s
+INFO ingest.end source=.\Wrong.csv status=success
