@@ -336,10 +336,10 @@ def read_json(filename):
         print(f"Error: The following error occured trying to read JSON from {filename}: {e}")
 
 #Drops the employee table. Mostly used for resetting the employee table.
-def drop_tables():
+def drop_table():
     try:
         config = load_config()
-        sql = "DROP TABLE employees" #Change when database details decided
+        sql = "DROP TABLE employees"
         with psycopg2.connect(**config) as conn:
             with conn.cursor() as cur:
                 if(table_exists()): #If table exists
@@ -349,6 +349,21 @@ def drop_tables():
                     print("Employees table does not exist")
     except (psycopg2.DatabaseError, Exception) as e:
         print(f"Failed to drop table Employees: {e}")
+
+#Clears/Truncates the employee table of data. Mostly used for resetting the employee table data.
+def clear_table():
+    try:
+        config = load_config()
+        sql = "TRUNCATE TABLE employees" #removes all data in employees
+        with psycopg2.connect(**config) as conn:
+            with conn.cursor() as cur:
+                if(table_exists()): #If table exists
+                    cur.execute(sql)
+                    print("Table Employees truncated")
+                else:
+                    print("Employees table does not exist")
+    except (psycopg2.DatabaseError, Exception) as e:
+        print(f"Failed to clear table Employees: {e}")
 
 #Reads the table and prints it line by line
 def read_table():
@@ -373,9 +388,11 @@ def read_commands(commands):
         elif command.endswith(".json"):
             read_json(command)
         elif command.lower() == "drop":
-            drop_tables()
+            drop_table()
         elif command.lower() == "read":
             read_table()
+        elif command.lower() == "clear" or command.lower() == "truncate":
+            clear_table()
         else:
             print("Invalid command/file")
 
