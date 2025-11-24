@@ -124,6 +124,7 @@ def fill_database(input_list):
             inserted = sum(inserted for (inserted,) in results)
             updated = len(results) - inserted
             print(f"Employee table updated {updated} rows and inserted {inserted} rows.")
+            return (inserted, updated)
     except (Exception, psycopg2.DatabaseError) as error:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         print(f"Error: The following error occured trying to insert into the database: {error} on line {exc_tb.tb_lineno}")
@@ -216,6 +217,7 @@ def check_all_valid(inputs):
         else:
             invalid.append((input, validity[1]))
     return (tuple(valid), tuple(invalid))
+
 #given a list of values, the desired parameter, and a dictionary of parameters and positions, return the desired parameter
 def get_csv_param(value_list, param, catagoryDict):
     if catagoryDict[param] == None:
@@ -252,24 +254,25 @@ def log_validation(source, results):
     with open("logger.txt", "a") as logger:
         logger.write(f"INFO ingest.validate source={source} valid={len(results[0])} invalid={len(results[1])}\n")
 
-#Log the results of inserting data given source, the inserted rows, and the start time
-def log_insert(source, rows, start): #NOTE: Change it so that it counts inserted and updated rows when possible
+#Log the results of inserting data given source, number of inserted rows, number of updated rows, and the start time
+def log_load(source, inserted, updated, start):
     timer = (datetime.now() - start).total_seconds()
     with open("logger.txt", "a") as logger:
-        logger.write(f"INFO ingest.load source={source} inserted={len(rows)} duration={timer}s\n")
+        logger.write(f"INFO ingest.load source={source} inserted={inserted} updated={updated} duration={timer}s\n")
 
 #Finishes log given source and status, which is presumed to be success
 def log_end(source, status="success"):
     with open("logger.txt", "a") as logger:
         logger.write(f"INFO ingest.end source={source} status={status}\n")
 
-#Logs rejected data with reasons 
+#Logs rejected data with reasons. This goes to a rejection_log.txt instead of logger.txt
 #NOTE: if possible change to a reject SQL table
 def log_rejects(rejections):
-    with open("rejection_log.txt", "a") as logger:
-        logger.write(f"\n-----{datetime.now()}-----\n")
-        for reject in rejections:
-            logger.write(f"{reject[0]}\nreason: {reject[1]}\n")
+    if len(rejections)>0: #If there are rejections
+        with open("rejection_log.txt", "a") as logger:
+            logger.write(f"\n-----{datetime.now()}-----\n")
+            for reject in rejections:
+                logger.write(f"{reject[0]}\nreason: {reject[1]}\n")
 
 #Reads a csv file
 def read_csv(filename):
@@ -305,12 +308,12 @@ def read_csv(filename):
                 #print(check_valid(sorted))
             log_start(filename, len(inputs), filename)
             filtered = filter_inputs(inputs)
-            results = check_all_valid(filtered)
-            log_validation(filename, results)
-            log_rejects(results[1])
+            validated = check_all_valid(filtered)
+            log_validation(filename, validated)
+            log_rejects(validated[1])
             start = datetime.now()
-            fill_database(results[0]) #Fill database with valid results
-            log_insert(filename, results[0], start)
+            results = fill_database(validated[0]) #Fill database with valid results
+            log_load(filename, results[0], results[1], start)
             log_end(filename)
 
             #print("Valid:")
