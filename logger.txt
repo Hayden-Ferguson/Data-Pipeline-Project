@@ -83,3 +83,15 @@ INFO ingest.start source=.\HR-Employee-Attrition.csv rows=1470 path=.\HR-Employe
 INFO ingest.validate source=.\HR-Employee-Attrition.csv valid=0 invalid=1470
 INFO ingest.load source=.\HR-Employee-Attrition.csv inserted=0 duration=0.159389s
 INFO ingest.end source=.\HR-Employee-Attrition.csv status=success
+
+-----2025-11-24 11:51:18.452011-----
+INFO ingest.start source=.\HR-Employee-Attrition.csv rows=1470 path=.\HR-Employee-Attrition.csv
+INFO ingest.validate source=.\HR-Employee-Attrition.csv valid=1470 invalid=0
+INFO ingest.load source=.\HR-Employee-Attrition.csv inserted=1470 duration=0.269739s
+INFO ingest.end source=.\HR-Employee-Attrition.csv status=success
+
+-----2025-11-24 11:51:20.629364-----
+INFO ingest.start source=.\HR-Employee-Attrition.csv rows=1470 path=.\HR-Employee-Attrition.csv
+INFO ingest.validate source=.\HR-Employee-Attrition.csv valid=1470 invalid=0
+INFO ingest.load source=.\HR-Employee-Attrition.csv inserted=1470 duration=0.2838s
+INFO ingest.end source=.\HR-Employee-Attrition.csv status=success

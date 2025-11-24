@@ -196,34 +196,20 @@ def check_valid(value_list):
     
     return (True, "Duplicate primary key or SQL injection") #Everything checks out, if rejected it's due to being a duplicate or being an injection
 
-#Gets a list of ordered inputs, returns a tuple of a list of valid and non-valid inputs. Does check primary keys.
-#NOTE: modify to not care if it's already in the database
+#Gets a list of ordered inputs, returns a tuple of a list of valid and non-valid inputs. Does not allow duplicate keys in same insert.
 def check_all_valid(inputs):
     valid = []
     invalid = []
-    config = load_config()
-    try:
-        with  psycopg2.connect(**config) as conn:
-            with  conn.cursor() as cur:
-                cur.execute("SELECT employee_number FROM employees") #Get the primary keys
-                
-                primary_keys = set(cur.fetchall()) #get primary keys and turn them into set for efficient look-up. Stored as (int, )
-                existing_primary_keys = set()
-                for input in inputs:
-                    #Not valid if primary keys already in database or valid.
-                    validity = check_valid(input)
-                    if validity[0] and (int(input[0]),) not in primary_keys and input[0] not in existing_primary_keys:
-                        valid.append(input)
-                        existing_primary_keys.add(input[0]) #shouldn't matter it's a string if we keep comparing input[0]
-                    else:
-                        invalid.append((input, validity[1]))
-                return (tuple(valid), tuple(invalid))
-
-            conn.commit() #NOTE: Pretty sure this is unneeded
-    except (Exception, psycopg2.DatabaseError) as error:
-        exc_type, exc_obj, exc_tb = sys.exc_info()
-        print(f"Error: The following error occured trying check validity of inputs: {error} on line {exc_tb.tb_lineno}")
-
+    existing_primary_keys = set()
+    for input in inputs:
+        #Not valid if primary keys already in database or valid.
+        validity = check_valid(input)
+        if validity[0] and input[0] not in existing_primary_keys:
+            valid.append(input)
+            existing_primary_keys.add(input[0]) #shouldn't matter it's a string if we keep comparing input[0]
+        else:
+            invalid.append((input, validity[1]))
+    return (tuple(valid), tuple(invalid))
 #given a list of values, the desired parameter, and a dictionary of parameters and positions, return the desired parameter
 def get_csv_param(value_list, param, catagoryDict):
     if catagoryDict[param] == None:
