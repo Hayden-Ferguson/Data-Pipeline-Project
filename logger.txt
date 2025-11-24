@@ -1,97 +1,105 @@
------2025-11-21 15:13:37.823948-----
-INFO ingest.start source=.\Wrong.csv rows=11 path=.\Wrong.csv
-INFO ingest.validate source=.\Wrong.csv valid=3 invalid=8
-INFO ingest.load source=.\Wrong.csv inserted=3 duration=0.102125s
-INFO ingest.end source=.\Wrong.csv status=success
-
------2025-11-21 15:23:33.573342-----
-INFO ingest.start source=.\Wrong.csv rows=11 path=.\Wrong.csv
-INFO ingest.validate source=.\Wrong.csv valid=3 invalid=8
-INFO ingest.load source=.\Wrong.csv inserted=3 duration=0.095413s
-INFO ingest.end source=.\Wrong.csv status=success
-
------2025-11-21 15:24:58.253604-----
-INFO ingest.start source=.\Wrong.csv rows=11 path=.\Wrong.csv
-INFO ingest.validate source=.\Wrong.csv valid=3 invalid=8
-INFO ingest.load source=.\Wrong.csv inserted=3 duration=0.22831s
-INFO ingest.end source=.\Wrong.csv status=success
-
------2025-11-21 15:26:23.784795-----
-INFO ingest.start source=.\Wrong.csv rows=11 path=.\Wrong.csv
-INFO ingest.validate source=.\Wrong.csv valid=3 invalid=8
-INFO ingest.load source=.\Wrong.csv inserted=3 duration=0.10999s
-INFO ingest.end source=.\Wrong.csv status=success
-
------2025-11-21 15:27:21.890913-----
-INFO ingest.start source=.\Wrong.csv rows=11 path=.\Wrong.csv
-INFO ingest.validate source=.\Wrong.csv valid=3 invalid=8
-INFO ingest.load source=.\Wrong.csv inserted=3 duration=0.111403s
-INFO ingest.end source=.\Wrong.csv status=success
-
-employees table dropped at 2025-11-21 15:38:10.118563
-
-employees table created at 2025-11-21 15:38:15.847481
-
------2025-11-21 15:38:15.847481-----
-INFO ingest.start source=.\Wrong.csv rows=11 path=.\Wrong.csv
-INFO ingest.validate source=.\Wrong.csv valid=3 invalid=8
-INFO ingest.load source=.\Wrong.csv inserted=3 duration=0.098955s
-INFO ingest.end source=.\Wrong.csv status=success
-
-employees table truncated at 2025-11-21 15:52:52.557139
-
------2025-11-24 09:18:14.983621-----
-INFO ingest.start source=.\Wrong.csv rows=12 path=.\Wrong.csv
-INFO ingest.validate source=.\Wrong.csv valid=3 invalid=9
-INFO ingest.load source=.\Wrong.csv inserted=3 duration=0.223189s
-INFO ingest.end source=.\Wrong.csv status=success
-
-employees table truncated at 2025-11-24 11:45:47.815631
-
------2025-11-24 11:45:52.384095-----
+-----2025-11-24 13:36:12.086496-----
 INFO ingest.start source=.\HR-Employee-Attrition.csv rows=1470 path=.\HR-Employee-Attrition.csv
 INFO ingest.validate source=.\HR-Employee-Attrition.csv valid=1470 invalid=0
-INFO ingest.load source=.\HR-Employee-Attrition.csv inserted=1470 duration=0.031296s
+INFO ingest.load source=.\HR-Employee-Attrition.csv inserted=1470 duration=0.680346s
 INFO ingest.end source=.\HR-Employee-Attrition.csv status=success
 
------2025-11-24 11:47:14.256364-----
+employees table truncated at 2025-11-24 13:59:00.276535
+
+-----2025-11-24 13:59:01.652957-----
 INFO ingest.start source=.\HR-Employee-Attrition.csv rows=1470 path=.\HR-Employee-Attrition.csv
 INFO ingest.validate source=.\HR-Employee-Attrition.csv valid=1470 invalid=0
-INFO ingest.load source=.\HR-Employee-Attrition.csv inserted=1470 duration=0.015691s
+INFO ingest.load source=.\HR-Employee-Attrition.csv inserted=1470 duration=0.191609s
 INFO ingest.end source=.\HR-Employee-Attrition.csv status=success
 
------2025-11-24 11:47:58.622652-----
+employees table truncated at 2025-11-24 13:59:09.433419
+
+-----2025-11-24 13:59:24.797273-----
 INFO ingest.start source=.\HR-Employee-Attrition.csv rows=1470 path=.\HR-Employee-Attrition.csv
 INFO ingest.validate source=.\HR-Employee-Attrition.csv valid=1470 invalid=0
-INFO ingest.load source=.\HR-Employee-Attrition.csv inserted=1470 duration=0.031796s
+INFO ingest.load source=.\HR-Employee-Attrition.csv inserted=1470 duration=0.18811s
 INFO ingest.end source=.\HR-Employee-Attrition.csv status=success
 
------2025-11-24 11:48:05.822542-----
+-----2025-11-24 13:59:33.127824-----
 INFO ingest.start source=.\HR-Employee-Attrition.csv rows=1470 path=.\HR-Employee-Attrition.csv
 INFO ingest.validate source=.\HR-Employee-Attrition.csv valid=1470 invalid=0
-INFO ingest.load source=.\HR-Employee-Attrition.csv inserted=1470 duration=0.138465s
+INFO ingest.load source=.\HR-Employee-Attrition.csv inserted=1470 duration=0.201621s
 INFO ingest.end source=.\HR-Employee-Attrition.csv status=success
 
------2025-11-24 11:48:20.951300-----
+-----2025-11-24 14:01:47.972598-----
 INFO ingest.start source=.\HR-Employee-Attrition.csv rows=1470 path=.\HR-Employee-Attrition.csv
 INFO ingest.validate source=.\HR-Employee-Attrition.csv valid=1470 invalid=0
-INFO ingest.load source=.\HR-Employee-Attrition.csv inserted=1470 duration=0.379654s
+INFO ingest.load source=.\HR-Employee-Attrition.csv inserted=1470 duration=0.187082s
 INFO ingest.end source=.\HR-Employee-Attrition.csv status=success
 
------2025-11-24 11:48:24.044511-----
-INFO ingest.start source=.\HR-Employee-Attrition.csv rows=1470 path=.\HR-Employee-Attrition.csv
-INFO ingest.validate source=.\HR-Employee-Attrition.csv valid=0 invalid=1470
-INFO ingest.load source=.\HR-Employee-Attrition.csv inserted=0 duration=0.159389s
-INFO ingest.end source=.\HR-Employee-Attrition.csv status=success
+employees table truncated at 2025-11-24 14:01:54.859639
 
------2025-11-24 11:51:18.452011-----
+-----2025-11-24 14:01:56.687207-----
 INFO ingest.start source=.\HR-Employee-Attrition.csv rows=1470 path=.\HR-Employee-Attrition.csv
 INFO ingest.validate source=.\HR-Employee-Attrition.csv valid=1470 invalid=0
-INFO ingest.load source=.\HR-Employee-Attrition.csv inserted=1470 duration=0.269739s
+INFO ingest.load source=.\HR-Employee-Attrition.csv inserted=1470 duration=0.20079s
 INFO ingest.end source=.\HR-Employee-Attrition.csv status=success
 
------2025-11-24 11:51:20.629364-----
+-----2025-11-24 15:20:32.815726-----
 INFO ingest.start source=.\HR-Employee-Attrition.csv rows=1470 path=.\HR-Employee-Attrition.csv
 INFO ingest.validate source=.\HR-Employee-Attrition.csv valid=1470 invalid=0
-INFO ingest.load source=.\HR-Employee-Attrition.csv inserted=1470 duration=0.2838s
+INFO ingest.load source=.\HR-Employee-Attrition.csv inserted=1470 duration=0.035356s
+INFO ingest.end source=.\HR-Employee-Attrition.csv status=success
+
+-----2025-11-24 15:21:35.684533-----
+INFO ingest.start source=.\HR-Employee-Attrition.csv rows=1470 path=.\HR-Employee-Attrition.csv
+INFO ingest.validate source=.\HR-Employee-Attrition.csv valid=1470 invalid=0
+INFO ingest.load source=.\HR-Employee-Attrition.csv inserted=1470 duration=0.087991s
+INFO ingest.end source=.\HR-Employee-Attrition.csv status=success
+
+employees table truncated at 2025-11-24 15:21:40.282929
+
+-----2025-11-24 15:21:41.843635-----
+INFO ingest.start source=.\HR-Employee-Attrition.csv rows=1470 path=.\HR-Employee-Attrition.csv
+INFO ingest.validate source=.\HR-Employee-Attrition.csv valid=1470 invalid=0
+INFO ingest.load source=.\HR-Employee-Attrition.csv inserted=1470 duration=0.079139s
+INFO ingest.end source=.\HR-Employee-Attrition.csv status=success
+
+-----2025-11-24 15:21:45.710094-----
+INFO ingest.start source=.\HR-Employee-Attrition.csv rows=1470 path=.\HR-Employee-Attrition.csv
+INFO ingest.validate source=.\HR-Employee-Attrition.csv valid=1470 invalid=0
+INFO ingest.load source=.\HR-Employee-Attrition.csv inserted=1470 duration=0.079262s
+INFO ingest.end source=.\HR-Employee-Attrition.csv status=success
+
+-----2025-11-24 15:22:28.864734-----
+INFO ingest.start source=.\HR-Employee-Attrition.csv rows=1470 path=.\HR-Employee-Attrition.csv
+INFO ingest.validate source=.\HR-Employee-Attrition.csv valid=1470 invalid=0
+INFO ingest.load source=.\HR-Employee-Attrition.csv inserted=1470 duration=0.08003s
+INFO ingest.end source=.\HR-Employee-Attrition.csv status=success
+
+-----2025-11-24 15:27:38.547697-----
+INFO ingest.start source=.\HR-Employee-Attrition.csv rows=1470 path=.\HR-Employee-Attrition.csv
+INFO ingest.validate source=.\HR-Employee-Attrition.csv valid=1470 invalid=0
+INFO ingest.load source=.\HR-Employee-Attrition.csv inserted=1470 duration=0.06762s
+INFO ingest.end source=.\HR-Employee-Attrition.csv status=success
+
+employees table truncated at 2025-11-24 15:27:42.651098
+
+-----2025-11-24 15:27:44.127385-----
+INFO ingest.start source=.\HR-Employee-Attrition.csv rows=1470 path=.\HR-Employee-Attrition.csv
+INFO ingest.validate source=.\HR-Employee-Attrition.csv valid=1470 invalid=0
+INFO ingest.load source=.\HR-Employee-Attrition.csv inserted=1470 duration=0.079278s
+INFO ingest.end source=.\HR-Employee-Attrition.csv status=success
+
+-----2025-11-24 15:27:54.157815-----
+INFO ingest.start source=.\HR-Employee-Attrition.csv rows=1470 path=.\HR-Employee-Attrition.csv
+INFO ingest.validate source=.\HR-Employee-Attrition.csv valid=1470 invalid=0
+INFO ingest.load source=.\HR-Employee-Attrition.csv inserted=1470 duration=0.07928s
+INFO ingest.end source=.\HR-Employee-Attrition.csv status=success
+
+-----2025-11-24 15:27:56.570739-----
+INFO ingest.start source=.\HR-Employee-Attrition.csv rows=1470 path=.\HR-Employee-Attrition.csv
+INFO ingest.validate source=.\HR-Employee-Attrition.csv valid=1470 invalid=0
+INFO ingest.load source=.\HR-Employee-Attrition.csv inserted=1470 duration=0.206618s
+INFO ingest.end source=.\HR-Employee-Attrition.csv status=success
+
+-----2025-11-24 15:28:33.180141-----
+INFO ingest.start source=.\HR-Employee-Attrition.csv rows=1470 path=.\HR-Employee-Attrition.csv
+INFO ingest.validate source=.\HR-Employee-Attrition.csv valid=1470 invalid=0
+INFO ingest.load source=.\HR-Employee-Attrition.csv inserted=1470 duration=0.063701s
 INFO ingest.end source=.\HR-Employee-Attrition.csv status=success

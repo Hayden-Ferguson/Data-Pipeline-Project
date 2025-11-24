@@ -4,6 +4,7 @@ import json
 import sys
 import re
 import os
+from psycopg2.extras import execute_values
 from datetime import datetime
 from config import load_config
 
@@ -97,7 +98,7 @@ def fill_database(input_list):
     "job_role, marital_status, monthly_rate, num_companies_worked, overtime, percent_salary_hike, performance_rating," \
     "relationship_satisfaction, standard_hours, stock_option_level, total_working_years, training_times_last_year," \
     "work_life_balance, years_at_company, years_in_current_role, years_since_last_promotion, years_with_current_manager) " \
-    "VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"\
+    "VALUES %s"\
     "ON CONFLICT (employee_number) DO UPDATE SET " \
     "(age, attrition, business_travel, department, distance_from_home, education, education_field, environment_satisfaction,"\
     "gender, hourly_rate, job_involvement, job_level, job_role, marital_status, monthly_rate, num_companies_worked, overtime,"\
@@ -109,15 +110,20 @@ def fill_database(input_list):
     "EXCLUDED.num_companies_worked, EXCLUDED.overtime, EXCLUDED.percent_salary_hike, EXCLUDED.performance_rating,"\
     "EXCLUDED.relationship_satisfaction, EXCLUDED.standard_hours, EXCLUDED.stock_option_level, EXCLUDED.total_working_years,"\
     "EXCLUDED.training_times_last_year, EXCLUDED.work_life_balance, EXCLUDED.years_at_company, EXCLUDED.years_in_current_role,"\
-    "EXCLUDED.years_since_last_promotion, EXCLUDED.years_with_current_manager);"
+    "EXCLUDED.years_since_last_promotion, EXCLUDED.years_with_current_manager)"\
+    "RETURNING (xmax=0) AS inserted;"
     config = load_config()
     try:
         with  psycopg2.connect(**config) as conn:
             with  conn.cursor() as cur:
-                cur.executemany(sql, input_list)
+                #cur.executemany(sql, input_list)
+                execute_values(cur, sql, input_list, page_size=len(input_list))
+                results = cur.fetchall()
 
             conn.commit()
-            print(f"Employee table updated with {cur.rowcount} rows")
+            inserted = sum(inserted for (inserted,) in results)
+            updated = len(results) - inserted
+            print(f"Employee table updated {updated} rows and inserted {inserted} rows.")
     except (Exception, psycopg2.DatabaseError) as error:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         print(f"Error: The following error occured trying to insert into the database: {error} on line {exc_tb.tb_lineno}")
