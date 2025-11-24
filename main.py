@@ -97,7 +97,19 @@ def fill_database(input_list):
     "job_role, marital_status, monthly_rate, num_companies_worked, overtime, percent_salary_hike, performance_rating," \
     "relationship_satisfaction, standard_hours, stock_option_level, total_working_years, training_times_last_year," \
     "work_life_balance, years_at_company, years_in_current_role, years_since_last_promotion, years_with_current_manager) " \
-    "VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+    "VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"\
+    "ON CONFLICT (employee_number) DO UPDATE SET " \
+    "(age, attrition, business_travel, department, distance_from_home, education, education_field, environment_satisfaction,"\
+    "gender, hourly_rate, job_involvement, job_level, job_role, marital_status, monthly_rate, num_companies_worked, overtime,"\
+    "percent_salary_hike, performance_rating, relationship_satisfaction, standard_hours, stock_option_level, total_working_years,"\
+    "training_times_last_year, work_life_balance, years_at_company, years_in_current_role, years_since_last_promotion, years_with_current_manager) "\
+    "= (EXCLUDED.age, EXCLUDED.attrition, EXCLUDED.business_travel, EXCLUDED.department, EXCLUDED.distance_from_home,"\
+    "EXCLUDED.education, EXCLUDED.education_field, EXCLUDED.environment_satisfaction, EXCLUDED.gender, EXCLUDED.hourly_rate,"\
+    "EXCLUDED.job_involvement, EXCLUDED.job_level, EXCLUDED.job_role, EXCLUDED.marital_status, EXCLUDED.monthly_rate,"\
+    "EXCLUDED.num_companies_worked, EXCLUDED.overtime, EXCLUDED.percent_salary_hike, EXCLUDED.performance_rating,"\
+    "EXCLUDED.relationship_satisfaction, EXCLUDED.standard_hours, EXCLUDED.stock_option_level, EXCLUDED.total_working_years,"\
+    "EXCLUDED.training_times_last_year, EXCLUDED.work_life_balance, EXCLUDED.years_at_company, EXCLUDED.years_in_current_role,"\
+    "EXCLUDED.years_since_last_promotion, EXCLUDED.years_with_current_manager);"
     config = load_config()
     try:
         with  psycopg2.connect(**config) as conn:
@@ -182,7 +194,7 @@ def check_valid(value_list):
         if value != None and (not re.match(r'^[+-]?[0-9]+$', value) or int(value) < 1 or int(value) > 5): #not Null and not an integer or outside 1-5 range
             return (False, f"{catagoryList[catagory]} is {value}, which is outside of the 1-5 range or not an integer")
     
-    return (True, "Duplicate primary key") #Everything checks out
+    return (True, "Duplicate primary key or SQL injection") #Everything checks out, if rejected it's due to being a duplicate or being an injection
 
 #Gets a list of ordered inputs, returns a tuple of a list of valid and non-valid inputs. Does check primary keys.
 #NOTE: modify to not care if it's already in the database
@@ -294,7 +306,7 @@ def read_csv(filename):
                     print(f"Missing non-Null catagories in CSV file {filename}.")
                     return
             
-            inputs = []
+            inputs = [] #NOTE: lines with " causes errors
             for line in csvFile: #Function does not do multiple lines at once do to limits of reading file
                 sorted = sort_csv_params(line, catagoryDict) 
                 inputs.append(sorted)

@@ -9,3 +9,5 @@ Negative distance_from_home
 job_involvement of 6
 job_involvement of 0
 Nothing (environment_satisfaction is null)
+Technically nothing (SQL injection)
+41,Yes,Travel_Rarely,1102,";DROP TABLE employees;--,1,2,Life Sciences,1,3,2,Female,94,3,2,Sales Executive,4,Single,5993,19479,8,Y,Yes,11,3,1,80,0,8,0,1,6,4,0,5 (SQL injection, removed for working on csv.read)
