@@ -10,6 +10,7 @@ from datetime import datetime
 from config import load_config
 
 import csv_reader
+import json_reader
 
 #NOTE: robust inputs, can recognize caragory names despite differences with capitalization or underscores.
 #TODO: incorporate machine learning to predict quitting
@@ -278,45 +279,6 @@ def upsert_call(inputs, filename):
         exc_type, exc_obj, exc_tb = sys.exc_info()
         print(f"Error: The following error occured trying to upsert from {filename}: {e} on line {exc_tb.tb_lineno}")
 
-#converts dictionaries from json to ordered list given a list of dictionaries
-def convert_json(dictionaries):
-    results = []
-    for dictionary in dictionaries:
-        result = []
-        for catagory in catagoryList:
-            if catagory != "years_with_current_manager":
-                standardized_catagory = re.sub(r'[^a-zA-Z]', '', catagory) #to account for differences in format
-                for k, v in dictionary.items(): #required due to different catagory name variations
-                    if re.sub(r'[^a-zA-Z]', '', k).lower() == standardized_catagory:
-                        result.append(v)
-                        break
-            else: #if years_with_current_manager, which has different name in original source
-                for k, v in dictionary.items(): #required due to different catagory name variations
-                    standard_key = re.sub(r'[^a-zA-Z]', '', k).lower()
-                    if standard_key == "yearswithcurrmanager" or standard_key == "yearswithcurrentmanager":
-                        result.append(v)
-                        break
-        results.append(result)
-    return results
-
-#Reads and prints a JSON file
-def read_json(filename):
-    try:
-        with open(filename, mode ='r') as file:
-            #df = pd.read_json(filename)
-            #print(df.head(1).to_dict())
-            data = json.load(file) #load and loads are for file vs string
-            #dictonaries = json.dumps(data) #same for dump and dumps output
-            converted = convert_json(data) #Convert dictionaries to ordered lists
-            upsert_call(converted, filename)
-    except FileNotFoundError:
-        print(f"Error: The file {filename} could not be found.")
-    except json.JSONDecodeError as e:
-        print(f"Error: Failed to decode JSON from the file {filename}: {e}")
-    except Exception as e:
-        exc_type, exc_obj, exc_tb = sys.exc_info()
-        print(f"Error: The following error occured trying to read JSON from {filename}: {e} on line {exc_tb.tb_lineno}")
-
 #Drops the employee table. Mostly used for resetting the employee table.
 def drop_table():
     try:
@@ -373,7 +335,8 @@ def read_commands(commands):
             inputs = csv_reader.read_csv(command)
             upsert_call(inputs, command)
         elif command.endswith(".json"):
-            read_json(command)
+            inputs = json_reader.read_json(command)
+            upsert_call(inputs, command)
         elif command.lower() == "drop":
             drop_table()
         elif command.lower() == "read":
