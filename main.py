@@ -4,6 +4,7 @@ import json
 import sys
 import re
 import os
+import pandas as pd
 from psycopg2.extras import execute_values
 from datetime import datetime
 from config import load_config
@@ -326,13 +327,24 @@ def read_csv(filename):
         exc_type, exc_obj, exc_tb = sys.exc_info()
         print(f"Error: The following error occured trying to read csv from {filename}: {e} on line {exc_tb.tb_lineno}")
 
+#converts dictionaries from json to ordered list given a list of dictionaries
+def convert_json(dictionaries):
+    results = []
+    for dictionary in dictionaries:
+        result = []
+        for catagory in catagoryList:
+            result.append(dictionary[catagory])
+        results.append(result)
+    return results
+
 #Reads and prints a JSON file
 def read_json(filename):
     try:
         with open(filename, mode ='r') as file:
-            for line in file:
-                data = json.loads(line) #load and loads are for file vs string
-                print(json.dumps(data)) #same for dump and dumps
+            #df = pd.read_json(filename)
+            #print(df.head(1).to_dict())
+            data = json.load(file) #load and loads are for file vs string
+            dictonaries = json.dumps(data) #same for dump and dumps output
     except FileNotFoundError:
         print(f"Error: The file {filename} could not be found.")
     except json.JSONDecodeError as e:
