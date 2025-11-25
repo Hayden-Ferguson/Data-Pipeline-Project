@@ -1,5 +1,0 @@
------2025-11-24 15:38:49.551043-----
-INFO ingest.start source=.\HR-Employee-Attrition.csv rows=1470 path=.\HR-Employee-Attrition.csv
-INFO ingest.validate source=.\HR-Employee-Attrition.csv valid=1470 invalid=0
-INFO ingest.load source=.\HR-Employee-Attrition.csv inserted=0 updated=1470 duration=0.057294s
-INFO ingest.end source=.\HR-Employee-Attrition.csv status=success

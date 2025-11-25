@@ -81,7 +81,7 @@ def create_tables():
     except (psycopg2.DatabaseError, Exception) as error:
         print(error)
 
-#Given a tuple of inputs, replace empty string with None. NOTE: Would set to DEFAULT with sql.SQL("DEFAULT"), but interferes with other functions.
+#Given a tuple of inputs, replace empty string with None. TODO: Would set to DEFAULT with sql.SQL("DEFAULT"), but interferes with other functions.
 def filter_inputs(input_list):
     params = len(input_list[0])
     filtered = input_list.copy() #Avoid modifying the original
@@ -91,7 +91,7 @@ def filter_inputs(input_list):
                 filtered[i][j] = None #Set it to none
     return filtered
 
-#Fills database with values given a list of inputs that contain ordered parameters NOTE: Modify to batch UPSERT
+#Fills database with values given a list of inputs that contain ordered parameters. Returns updates and inserts for logging purposes.
 def fill_database(input_list):
     sql = "INSERT INTO employees(employee_number, age, attrition, business_travel, department, distance_from_home," \
     "education, education_field, environment_satisfaction, gender, hourly_rate, job_involvement, job_level," \
@@ -128,7 +128,6 @@ def fill_database(input_list):
     except (Exception, psycopg2.DatabaseError) as error:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         print(f"Error: The following error occured trying to insert into the database: {error} on line {exc_tb.tb_lineno}")
-
 
 """
 For reference:
@@ -243,7 +242,7 @@ def sort_csv_params(value_list, catagoryDict):
             get_csv_param(value_list, "yearssincelastpromotion", catagoryDict), get_csv_param(value_list, "yearswithcurrmanager", catagoryDict)]
 
 #Start a new logger session given source, number of rows from source, and path to source
-#NOTE: modify this once we have YAML configuration to not need source and path
+#TODO: modify this once we have YAML configuration to not need source and path
 def log_start(source, rows, path):
     with open("logger.txt", "a") as logger:
         logger.write(f"\n-----{datetime.now()}-----\n")
@@ -266,7 +265,7 @@ def log_end(source, status="success"):
         logger.write(f"INFO ingest.end source={source} status={status}\n")
 
 #Logs rejected data with reasons. This goes to a rejection_log.txt instead of logger.txt
-#NOTE: if possible change to a reject SQL table
+#TODO: if possible change to a reject SQL table
 def log_rejects(rejections):
     if len(rejections)>0: #If there are rejections
         with open("rejection_log.txt", "a") as logger:
@@ -274,9 +273,21 @@ def log_rejects(rejections):
             for reject in rejections:
                 logger.write(f"{reject[0]}\nreason: {reject[1]}\n")
 
+#Does all the stuff that needs to be done when upsert is called, given sorted inputs and filename
+def upsert_call(inputs, filename):
+    log_start(filename, len(inputs), filename)
+    filtered = filter_inputs(inputs)
+    validated = check_all_valid(filtered)
+    log_validation(filename, validated)
+    log_rejects(validated[1])
+    start = datetime.now()
+    results = fill_database(validated[0]) #Fill database with valid results
+    log_load(filename, results[0], results[1], start)
+    log_end(filename)
+
 #Reads a csv file
 def read_csv(filename):
-    try: #NOTE: Could probably make things way more efficient with pandas
+    try: #TODO: Could probably make things way more efficient with pandas
         with open(filename, mode ='r') as file:
             csvFile = csv.reader(file)
             #Find catagories from CSV file to match up to SQL table
@@ -305,23 +316,8 @@ def read_csv(filename):
             for line in csvFile: #Function does not do multiple lines at once do to limits of reading file
                 sorted = sort_csv_params(line, catagoryDict) 
                 inputs.append(sorted)
-                #print(check_valid(sorted))
-            log_start(filename, len(inputs), filename)
-            filtered = filter_inputs(inputs)
-            validated = check_all_valid(filtered)
-            log_validation(filename, validated)
-            log_rejects(validated[1])
-            start = datetime.now()
-            results = fill_database(validated[0]) #Fill database with valid results
-            log_load(filename, results[0], results[1], start)
-            log_end(filename)
+            upsert_call(inputs, filename)
 
-            #print("Valid:")
-            #for valid in results[0]:
-            #    print(valid)
-            #print("Invalid:")
-            #for invalid in results[1]:
-            #    print(invalid)
     except FileNotFoundError:
         print(f"Error: The file {filename} could not be found.")
     except csv.Error as e:
