@@ -4,12 +4,13 @@ import json
 import sys
 import re
 import os
-import pandas as pd
+#import pandas as pd
 from psycopg2.extras import execute_values
 from datetime import datetime
 from config import load_config
 
-#List of catagories for reference
+#List of catagories for reference #TODO: modify functions to not use regex if not required
+#NOTE: years_with_current_manager was YearsWithCurrManager in original source
 catagoryList=["employee_number", "age", "attrition", "business_travel", "department", "distance_from_home", \
     "education", "education_field", "environment_satisfaction", "gender", "hourly_rate", "job_involvement", "job_level", \
     "job_role", "marital_status", "monthly_rate", "num_companies_worked", "overtime", "percent_salary_hike", "performance_rating", \
@@ -167,41 +168,46 @@ TABLE employees(
 """
 #Gets a properly ordered list of values, and checks if it's valid. NOTE: Does not check if primary key is in use for efficiency sake
 def check_valid(value_list):
-    notNullCatagories = [0, 1, 3, 4, 6, 7, 10, 12, 13, 15]
-    for catagory in notNullCatagories: #Not null field is null
-        value = value_list[catagory]
-        if value == None or value == "": #assume empty entires in csv means Null
-            return (False, f"{catagoryList[catagory]} is Null")
-    
-    if not re.match(r'^[+-]?[0-9]+$', value_list[1]) or int(value_list[1]) < 18: #Not an adult or non-integer
-        return (False, f"age is {value_list[1]}, which is below 18 or not an integer")
-    
-    if len(value_list[3])>20: #buisness_travel is too long
-        return (False, f"buisness_travel is {value_list[3]}, which is too long")
-    if len(value_list[4])>30: #department is too long
-        return (False, f"department is {value_list[4]}, which is too long")
-    if len(value_list[7])>30: #education_field is too long
-        return (False, f"education_field is {value_list[7]}, which is too long")
-    if len(value_list[9])>20: #gender is too long
-        return (False, f"gender is {value_list[9]}, which is too long")
-    if len(value_list[13])>30: #job_role is too long
-        return (False, f"job_role is {value_list[13]}, which is too long")
-    if len(value_list[14])>10: #marital_status is too long
-        return (False, f"marital_status is {value_list[14]}, which is too long")
-    
-    nonNegativeCatagories = [5, 10, 15, 16, 21, 22, 23, 24, 26, 27, 28, 29]
-    for catagory in nonNegativeCatagories: #Field that should be a non-negative integer isn't
-        value = value_list[catagory]
-        if value != None and ((not re.match(r'^[+-]?[0-9]+$', value)) or int(value) < 0): #not Null and not an integer or negative
-            return (False, f"{catagoryList[catagory]} is {value}, which is either negative or not an integer")
+    try:
+        notNullCatagories = [0, 1, 3, 4, 6, 7, 10, 12, 13, 15]
+        for catagory in notNullCatagories: #Not null field is null
+            value = value_list[catagory]
+            if value == None or value == "": #assume empty entires in csv means Null
+                return (False, f"{catagoryList[catagory]} is Null")
+        
+        #print(type(value))
+        if not (type(value_list[1]) == int or re.match(r'^[+-]?[0-9]+$', value_list[1])) or int(value_list[1]) < 18: #Not an adult or non-integer
+            return (False, f"age is {value_list[1]}, which is below 18 or not an integer")
+        
+        if len(value_list[3])>20: #buisness_travel is too long
+            return (False, f"buisness_travel is {value_list[3]}, which is too long")
+        if len(value_list[4])>30: #department is too long
+            return (False, f"department is {value_list[4]}, which is too long")
+        if len(value_list[7])>30: #education_field is too long
+            return (False, f"education_field is {value_list[7]}, which is too long")
+        if len(value_list[9])>20: #gender is too long
+            return (False, f"gender is {value_list[9]}, which is too long")
+        if len(value_list[13])>30: #job_role is too long
+            return (False, f"job_role is {value_list[13]}, which is too long")
+        if len(value_list[14])>10: #marital_status is too long
+            return (False, f"marital_status is {value_list[14]}, which is too long")
+        
+        nonNegativeCatagories = [5, 10, 15, 16, 21, 22, 23, 24, 26, 27, 28, 29]
+        for catagory in nonNegativeCatagories: #Field that should be a non-negative integer isn't
+            value = value_list[catagory]
+            if value != None and (not (type(value) == int or re.match(r'^[+-]?[0-9]+$', value)) or int(value) < 0): #not Null and not an integer or negative
+                return (False, f"{catagoryList[catagory]} is {value}, which is either negative or not an integer")
 
-    gradingCatagories = [6, 8, 11, 12, 19, 20, 25]
-    for catagory in gradingCatagories: #Field for 1-5 integer grading has value outside of that.
-        value = value_list[catagory]
-        if value != None and (not re.match(r'^[+-]?[0-9]+$', value) or int(value) < 1 or int(value) > 5): #not Null and not an integer or outside 1-5 range
-            return (False, f"{catagoryList[catagory]} is {value}, which is outside of the 1-5 range or not an integer")
-    
-    return (True, "Duplicate primary key or SQL injection") #Everything checks out, if rejected it's due to being a duplicate or being an injection
+        gradingCatagories = [6, 8, 11, 12, 19, 20, 25]
+        for catagory in gradingCatagories: #Field for 1-5 integer grading has value outside of that.
+            value = value_list[catagory] #not Null and not an integer or outside 1-5 range
+            if value != None and (not (type(value) == int or re.match(r'^[+-]?[0-9]+$', value)) or int(value) < 1 or int(value) > 5): 
+                return (False, f"{catagoryList[catagory]} is {value}, which is outside of the 1-5 range or not an integer")
+        
+        return (True, "Duplicate primary key or SQL injection") #Everything checks out, if rejected it's due to being a duplicate or being an injection
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        print(f"Error: The following error occured trying to validate values: {e} on line {exc_tb.tb_lineno}")
 
 #Gets a list of ordered inputs, returns a tuple of a list of valid and non-valid inputs. Does not allow duplicate keys in same insert.
 def check_all_valid(inputs):
@@ -276,15 +282,19 @@ def log_rejects(rejections):
 
 #Does all the stuff that needs to be done when upsert is called, given sorted inputs and filename
 def upsert_call(inputs, filename):
-    log_start(filename, len(inputs), filename)
-    filtered = filter_inputs(inputs)
-    validated = check_all_valid(filtered)
-    log_validation(filename, validated)
-    log_rejects(validated[1])
-    start = datetime.now()
-    results = fill_database(validated[0]) #Fill database with valid results
-    log_load(filename, results[0], results[1], start)
-    log_end(filename)
+    try:
+        log_start(filename, len(inputs), filename)
+        filtered = filter_inputs(inputs)
+        validated = check_all_valid(filtered)
+        log_validation(filename, validated)
+        log_rejects(validated[1])
+        start = datetime.now()
+        results = fill_database(validated[0]) #Fill database with valid results
+        log_load(filename, results[0], results[1], start)
+        log_end(filename)
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        print(f"Error: The following error occured trying to upsert from {filename}: {e} on line {exc_tb.tb_lineno}")
 
 #Reads a csv file
 def read_csv(filename):
@@ -333,7 +343,18 @@ def convert_json(dictionaries):
     for dictionary in dictionaries:
         result = []
         for catagory in catagoryList:
-            result.append(dictionary[catagory])
+            if catagory != "years_with_current_manager":
+                standardized_catagory = re.sub(r'[^a-zA-Z]', '', catagory) #to account for differences in format
+                for k, v in dictionary.items(): #required due to different catagory name variations
+                    if re.sub(r'[^a-zA-Z]', '', k).lower() == standardized_catagory:
+                        result.append(v)
+                        break
+            else: #if years_with_current_manager, which has different name in original source
+                for k, v in dictionary.items(): #required due to different catagory name variations
+                    standard_key = re.sub(r'[^a-zA-Z]', '', k).lower()
+                    if standard_key == "yearswithcurrmanager" or standard_key == "yearswithcurrentmanager":
+                        result.append(v)
+                        break
         results.append(result)
     return results
 
@@ -344,13 +365,16 @@ def read_json(filename):
             #df = pd.read_json(filename)
             #print(df.head(1).to_dict())
             data = json.load(file) #load and loads are for file vs string
-            dictonaries = json.dumps(data) #same for dump and dumps output
+            #dictonaries = json.dumps(data) #same for dump and dumps output
+            converted = convert_json(data) #Convert dictionaries to ordered lists
+            upsert_call(converted, filename)
     except FileNotFoundError:
         print(f"Error: The file {filename} could not be found.")
     except json.JSONDecodeError as e:
         print(f"Error: Failed to decode JSON from the file {filename}: {e}")
     except Exception as e:
-        print(f"Error: The following error occured trying to read JSON from {filename}: {e}")
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        print(f"Error: The following error occured trying to read JSON from {filename}: {e} on line {exc_tb.tb_lineno}")
 
 #Drops the employee table. Mostly used for resetting the employee table.
 def drop_table():
