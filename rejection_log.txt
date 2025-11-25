@@ -1,0 +1,20 @@
+
+-----2025-11-25 09:28:16.800096-----
+['1', '41', 'Yes', 'Travel_Rarely', 'Sales', '1', '2', 'Life Sciences', '2', 'Female', '94', '3', '2', 'Sales Executive', 'Single', '19479', '8', 'Yes', '11', '1', '3', '80', '0', '8', '0', '1', '6', '4', '0', '5']
+reason: Duplicate primary key or SQL injection
+['2', 'fourty one', 'Yes', 'Travel_Rarely', 'Sales', '1', '2', 'Life Sciences', '2', 'Female', '94', '3', '2', 'Sales Executive', 'Single', '19479', '8', 'Yes', '11', '1', '3', '80', '0', '8', '0', '1', '6', '4', '0', '5']
+reason: age is fourty one, which is below 18 or not an integer
+['2', '41', 'Yes', None, 'Sales', '1', '2', 'Life Sciences', '2', 'Female', '94', '3', '2', 'Sales Executive', 'Single', '19479', '8', 'Yes', '11', '1', '3', '80', '0', '8', '0', '1', '6', '4', '0', '5']
+reason: business_travel is Null
+['2', '41', 'Yes', 'Travel_Rarelyadwadwadawdad', 'Sales', '1', '2', 'Life Sciences', '2', 'Female', '94', '3', '2', 'Sales Executive', 'Single', '19479', '8', 'Yes', '11', '1', '3', '80', '0', '8', '0', '1', '6', '4', '0', '5']
+reason: buisness_travel is Travel_Rarelyadwadwadawdad, which is too long
+['3', '17', 'Yes', 'Travel_Rarely', 'Sales', '1', '2', 'Life Sciences', '2', 'Female', '94', '3', '2', 'Sales Executive', 'Single', '19479', '8', 'Yes', '11', '1', '3', '80', '0', '8', '0', '1', '6', '4', '0', '5']
+reason: age is 17, which is below 18 or not an integer
+['3', '18', 'Yes', 'Travel_Rarely', 'Sales', '-1', '2', 'Life Sciences', '2', 'Female', '94', '3', '2', 'Sales Executive', 'Single', '19479', '8', 'Yes', '11', '1', '3', '80', '0', '8', '0', '1', '6', '4', '0', '5']
+reason: distance_from_home is -1, which is either negative or not an integer
+['3', '18', 'Yes', 'Travel_Rarely', 'Sales', '1', '2', 'Life Sciences', '2', 'Female', '94', '6', '2', 'Sales Executive', 'Single', '19479', '8', 'Yes', '11', '1', '3', '80', '0', '8', '0', '1', '6', '4', '0', '5']
+reason: job_involvement is 6, which is outside of the 1-5 range or not an integer
+['3', '18', 'Yes', 'Travel_Rarely', 'Sales', '1', '2', 'Life Sciences', '2', 'Female', '94', '0', '2', 'Sales Executive', 'Single', '19479', '8', 'Yes', '11', '1', '3', '80', '0', '8', '0', '1', '6', '4', '0', '5']
+reason: job_involvement is 0, which is outside of the 1-5 range or not an integer
+['3', '41', 'Yes', 'Travel_Rarely', "';DROP TABLE employees;--", '1', '2', 'Life Sciences', '2', 'Female', '94', '3', '2', 'Sales Executive', 'Single', '19479', '8', 'Yes', '11', '1', '3', '80', '0', '8', '0', '1', '6', '4', '0', '5']
+reason: Duplicate primary key or SQL injection
