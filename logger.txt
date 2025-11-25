@@ -1,6 +1,0 @@
-
------2025-11-25 09:28:16.800096-----
-INFO ingest.start source=.\Wrong.csv rows=12 path=.\Wrong.csv
-INFO ingest.validate source=.\Wrong.csv valid=3 invalid=9
-INFO ingest.load source=.\Wrong.csv inserted=0 updated=3 duration=0.095679s
-INFO ingest.end source=.\Wrong.csv status=success
