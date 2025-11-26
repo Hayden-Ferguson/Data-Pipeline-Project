@@ -63,8 +63,6 @@ def create_tables():
                 if(not table_exists()): #If table doesn't exist
                     cur.execute(command)
                     print("Employees table created")
-                    with open("logger.txt", "a") as logger:
-                        logger.write(f"\nemployees table created at {datetime.now()}\n")
                 else: #Shouldn't happen from main function
                     print("Employees table already exists")
     except (psycopg2.DatabaseError, Exception) as error:
@@ -120,8 +118,6 @@ def drop_table():
                 if(table_exists()): #If table exists
                     cur.execute(sql)
                     print("Table Employees dropped")
-                    with open("logger.txt", "a") as logger:
-                        logger.write(f"\nemployees table dropped at {datetime.now()}\n")
                 else:
                     print("Employees table does not exist")
     except (psycopg2.DatabaseError, Exception) as e:

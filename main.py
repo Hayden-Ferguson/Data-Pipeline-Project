@@ -7,6 +7,7 @@ from datetime import datetime
 import csv_reader
 import json_reader
 import sql_interface
+import logger
 
 #NOTE: robust inputs, can recognize caragory names despite differences with capitalization or underscores.
 #TODO: incorporate machine learning to predict quitting
@@ -123,50 +124,18 @@ def check_all_valid(inputs):
             invalid.append((input, validity[1]))
     return (tuple(valid), tuple(invalid))
 
-#Start a new logger session given source, number of rows from source, and path to source
-#TODO: modify this once we have YAML configuration to not need source and path
-def log_start(source, rows, path):
-    with open("logger.txt", "a") as logger:
-        logger.write(f"\n-----{datetime.now()}-----\n")
-        logger.write(f"INFO ingest.start source={source} rows={rows} path={path}\n")
-
-#Log the results of data validation given source and the results
-def log_validation(source, results):
-    with open("logger.txt", "a") as logger:
-        logger.write(f"INFO ingest.validate source={source} valid={len(results[0])} invalid={len(results[1])}\n")
-
-#Log the results of inserting data given source, number of inserted rows, number of updated rows, and the start time
-def log_load(source, inserted, updated, start):
-    timer = (datetime.now() - start).total_seconds()
-    with open("logger.txt", "a") as logger:
-        logger.write(f"INFO ingest.load source={source} inserted={inserted} updated={updated} duration={timer}s\n")
-
-#Finishes log given source and status, which is presumed to be success
-def log_end(source, status="success"):
-    with open("logger.txt", "a") as logger:
-        logger.write(f"INFO ingest.end source={source} status={status}\n")
-
-#Logs rejected data with reasons. This goes to a rejection_log.txt instead of logger.txt
-#TODO: if possible change to a reject SQL table
-def log_rejects(rejections):
-    if len(rejections)>0: #If there are rejections
-        with open("rejection_log.txt", "a") as logger:
-            logger.write(f"\n-----{datetime.now()}-----\n")
-            for reject in rejections:
-                logger.write(f"{reject[0]}\nreason: {reject[1]}\n")
-
 #Does all the stuff that needs to be done when upsert is called, given sorted inputs and filename
 def upsert_call(inputs, filename):
     try:
-        log_start(filename, len(inputs), filename)
+        logger.log_start(filename, len(inputs), filename)
         filtered = filter_inputs(inputs)
         validated = check_all_valid(filtered)
-        log_validation(filename, validated)
-        log_rejects(validated[1])
+        logger.log_validation(filename, validated)
+        logger.log_rejects(validated[1])
         start = datetime.now()
         results = sql_interface.fill_database(validated[0]) #Fill database with valid results
-        log_load(filename, results[0], results[1], start)
-        log_end(filename)
+        logger.log_load(filename, results[0], results[1], start)
+        logger.log_end(filename)
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         print(f"Error: The following error occured trying to upsert from {filename}: {e} on line {exc_tb.tb_lineno}")
@@ -182,17 +151,21 @@ def read_commands(commands):
             upsert_call(inputs, command)
         elif command.lower() == "drop":
             sql_interface.drop_table()
+            with open("logger.txt", "a") as log:
+                log.write(f"\nemployees table dropped at {datetime.now()}\n")
         elif command.lower() == "read":
             sql_interface.read_table()
         elif command.lower() == "clear" or command.lower() == "truncate":
             sql_interface.clear_table()
-            with open("logger.txt", "a") as logger:
-                logger.write(f"\nemployees table truncated at {datetime.now()}\n")
+            with open("logger.txt", "a") as log:
+                log.write(f"\nemployees table truncated at {datetime.now()}\n")
         else:
             print("Invalid command/file")
 
 if __name__ == '__main__':
     if not sql_interface.table_exists(): #if the employees table doesn't exist, create it
         sql_interface.create_tables()
+        with open("logger.txt", "a") as log:
+            log.write(f"\nemployees table created at {datetime.now()}\n")
     if len(sys.argv)>1: #If there are parameters to calling the main function
         read_commands(sys.argv[1:])
