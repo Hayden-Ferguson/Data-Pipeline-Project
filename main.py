@@ -138,14 +138,16 @@ def upsert_call(inputs, filename):
         logger.log_end(filename)
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
-        print(f"Error: The following error occured trying to upsert from {filename}: {e} on line {exc_tb.tb_lineno}")
+        file_name = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+        print(f"Error: The following error occured trying to upsert from {filename}: {e} on line {exc_tb.tb_lineno} in {file_name}")
 
 #Takes a list of commands and performs them, reading any csv or json files given
 def read_commands(commands):
     for command in commands:
         if command.endswith(".csv"):
             inputs = csv_reader.read_csv(command)
-            upsert_call(inputs, command)
+            if inputs is not None:
+                upsert_call(inputs, command)
         elif command.endswith(".json"):
             inputs = json_reader.read_json(command)
             upsert_call(inputs, command)

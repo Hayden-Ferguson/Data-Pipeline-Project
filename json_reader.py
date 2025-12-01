@@ -1,6 +1,7 @@
 import json
 import sys
 import re
+import os
 
 #List of catagories for reference #TODO: modify functions to not use regex if not required
 #NOTE: years_with_current_manager was YearsWithCurrManager in original source
@@ -48,4 +49,5 @@ def read_json(filename):
         print(f"Error: Failed to decode JSON from the file {filename}: {e}")
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
-        print(f"Error: The following error occured trying to read JSON from {filename}: {e} on line {exc_tb.tb_lineno}")
+        file_name = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+        print(f"Error: The following error occured trying to read JSON from {filename}: {e} on line {exc_tb.tb_lineno} in {file_name}")
