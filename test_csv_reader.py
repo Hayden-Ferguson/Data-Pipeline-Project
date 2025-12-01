@@ -28,4 +28,11 @@ def test_get_catagory_dict():
     catagoryDict = csv_reader.get_catagory_dict(desired_catagories, csv_catagories)
     assert catagoryDict["yearswithcurrentmanager"] == 0
 
-#def test_
+def test_get_csv_param():
+    value_list = [1,2,3]
+    catagoryDict = {'a': 0, 'b': 1, 'c':2, 'd':None}
+    assert csv_reader.get_csv_param(value_list, 'a', catagoryDict) == 1
+    assert csv_reader.get_csv_param(value_list, 'b', catagoryDict) == 2
+    assert csv_reader.get_csv_param(value_list, 'c', catagoryDict) == 3
+    assert csv_reader.get_csv_param(value_list, 'd', catagoryDict) == None
+    assert csv_reader.get_csv_param(value_list, 'e', catagoryDict) == None

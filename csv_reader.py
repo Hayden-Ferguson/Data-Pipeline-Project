@@ -28,7 +28,7 @@ def get_catagory_dict(desired_catagories, csv_catagories):
 
 #given a list of values, the desired parameter, and a dictionary of parameters and positions, return the desired parameter
 def get_csv_param(value_list, param, catagoryDict):
-    if catagoryDict[param] == None:
+    if param not in catagoryDict.keys() or catagoryDict[param] == None:
         return None
     return value_list[catagoryDict[param]]
 
