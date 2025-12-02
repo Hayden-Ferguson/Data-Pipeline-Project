@@ -12,5 +12,19 @@ def test_table_exists():
                 cur.execute("CREATE TABLE test ()")
     except (psycopg2.DatabaseError, Exception) as error:
         print(error)
+    
     assert sql_interface.table_exists("test") == True
     assert sql_interface.table_exists("nonexistant") == False
+
+def test_drop_table():
+    try:
+        config = load_config()
+        with psycopg2.connect(**config) as conn:
+            with conn.cursor() as cur:
+                cur.execute("CREATE TABLE test ()")
+    except (psycopg2.DatabaseError, Exception) as error:
+        print(error)
+        
+    assert sql_interface.table_exists("test") == True
+    sql_interface.drop_table("test")
+    assert sql_interface.table_exists("test") == False
