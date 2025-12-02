@@ -104,7 +104,7 @@ def check_valid(value_list):
             if value != None and (not (type(value) == int or re.match(r'^[+-]?[0-9]+$', value)) or int(value) < 1 or int(value) > 5): 
                 return (False, f"{catagoryList[catagory]} is {value}, which is outside of the 1-5 range or not an integer")
         
-        return (True, "Duplicate primary key or SQL injection") #Everything checks out, if rejected it's due to being a duplicate or being an injection
+        return (True, "Duplicate primary key") #Everything checks out, if rejected it's due to being a duplicate
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         print(f"Error: The following error occured trying to validate values: {e} on line {exc_tb.tb_lineno}")
