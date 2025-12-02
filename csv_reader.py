@@ -32,23 +32,12 @@ def get_csv_param(value_list, param, catagoryDict):
         return None
     return value_list[catagoryDict[param]]
 
-#Given a value list and a dictionary of parameters and positions, returns an ordered list of parameters
-def sort_csv_params(value_list, catagoryDict):
-    return [get_csv_param(value_list, "employeenumber", catagoryDict), get_csv_param(value_list, "age", catagoryDict),\
-            get_csv_param(value_list, "attrition", catagoryDict), get_csv_param(value_list, "businesstravel", catagoryDict),\
-            get_csv_param(value_list, "department", catagoryDict), get_csv_param(value_list, "distancefromhome", catagoryDict), \
-            get_csv_param(value_list, "education", catagoryDict), get_csv_param(value_list, "educationfield", catagoryDict),\
-            get_csv_param(value_list, "environmentsatisfaction", catagoryDict), get_csv_param(value_list, "gender", catagoryDict),\
-            get_csv_param(value_list, "hourlyrate", catagoryDict), get_csv_param(value_list, "jobinvolvement", catagoryDict), \
-            get_csv_param(value_list, "joblevel", catagoryDict), get_csv_param(value_list, "jobrole", catagoryDict),\
-            get_csv_param(value_list, "maritalstatus", catagoryDict), get_csv_param(value_list, "monthlyrate", catagoryDict),\
-            get_csv_param(value_list, "numcompaniesworked", catagoryDict), get_csv_param(value_list, "overtime", catagoryDict), \
-            get_csv_param(value_list, "percentsalaryhike", catagoryDict), get_csv_param(value_list, "relationshipsatisfaction", catagoryDict),\
-            get_csv_param(value_list, "performancerating", catagoryDict), get_csv_param(value_list, "standardhours", catagoryDict),\
-            get_csv_param(value_list, "stockoptionlevel", catagoryDict), get_csv_param(value_list, "totalworkingyears", catagoryDict),\
-            get_csv_param(value_list, "trainingtimeslastyear", catagoryDict), get_csv_param(value_list, "worklifebalance", catagoryDict),\
-            get_csv_param(value_list, "yearsatcompany", catagoryDict), get_csv_param(value_list, "yearsincurrentrole", catagoryDict),\
-            get_csv_param(value_list, "yearssincelastpromotion", catagoryDict), get_csv_param(value_list, "yearswithcurrentmanager", catagoryDict)]
+#Given a value list, ordered list of desired catagories, and a dictionary of catagories and positions, returns an ordered list of parameters
+def sort_csv_params(value_list, catagoryList, catagoryDict):
+    ans = []
+    for catagory in catagoryList:
+        ans.append(get_csv_param(value_list, re.sub(r'[^a-zA-Z]', '', catagory).lower(), catagoryDict))
+    return ans
 
 #Reads a csv file and sorts it's contents. Returns a list of sorted inputs
 def read_csv(filename):
@@ -67,7 +56,7 @@ def read_csv(filename):
             
             inputs = [] #NOTE: lines with " causes errors
             for line in csvFile: #Function does not do multiple lines at once do to limits of reading file
-                sorted = sort_csv_params(line, catagoryDict) 
+                sorted = sort_csv_params(line, catagoryList, catagoryDict) 
                 inputs.append(sorted)
             return inputs
         

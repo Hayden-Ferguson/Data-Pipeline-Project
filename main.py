@@ -153,13 +153,13 @@ def read_commands(commands):
             upsert_call(inputs, command)
         elif command.lower() == "drop":
             sql_interface.drop_table()
-            with open("logger.txt", "a") as log:
+            with open("logger.txt", "a") as log: #log dropping table
                 log.write(f"\nemployees table dropped at {datetime.now()}\n")
         elif command.lower() == "read":
             sql_interface.read_table()
         elif command.lower() == "clear" or command.lower() == "truncate":
             sql_interface.clear_table()
-            with open("logger.txt", "a") as log:
+            with open("logger.txt", "a") as log: #log truncating table
                 log.write(f"\nemployees table truncated at {datetime.now()}\n")
         else:
             print("Invalid command/file")
@@ -167,7 +167,7 @@ def read_commands(commands):
 if __name__ == '__main__':
     if not sql_interface.table_exists(): #if the employees table doesn't exist, create it
         sql_interface.create_tables()
-        with open("logger.txt", "a") as log:
+        with open("logger.txt", "a") as log: #log table creation
             log.write(f"\nemployees table created at {datetime.now()}\n")
     if len(sys.argv)>1: #If there are parameters to calling the main function
         read_commands(sys.argv[1:])
