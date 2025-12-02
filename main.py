@@ -149,7 +149,7 @@ def read_commands(commands):
             if inputs is not None:
                 upsert_call(inputs, command)
         elif command.endswith(".json"):
-            inputs = json_reader.read_json(command)
+            inputs = json_reader.read_json(command) #TODO: check if None return possible
             upsert_call(inputs, command)
         elif command.lower() == "drop":
             sql_interface.drop_table()
@@ -165,7 +165,7 @@ def read_commands(commands):
             print("Invalid command/file")
 
 if __name__ == '__main__':
-    if not sql_interface.table_exists(): #if the employees table doesn't exist, create it
+    if not sql_interface.table_exists("employees"): #if the employees table doesn't exist, create it
         sql_interface.create_tables()
         with open("logger.txt", "a") as log: #log table creation
             log.write(f"\nemployees table created at {datetime.now()}\n")

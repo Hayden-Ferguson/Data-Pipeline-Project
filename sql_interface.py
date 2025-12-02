@@ -4,18 +4,18 @@ from config import load_config
 from psycopg2.extras import execute_values
 
 
-#Returns True if the employees table exists, returns False otherwise
-def table_exists():
+#Returns True if the provided table exists, returns False otherwise
+def table_exists(table):
     try:
         config = load_config()
         with psycopg2.connect(**config) as conn:
             with conn.cursor() as cur:
-                cur.execute("SELECT EXISTS(SELECT 1 FROM information_schema.tables WHERE table_name='employees')") #Determines if the employees table exists
+                cur.execute(f"SELECT EXISTS(SELECT 1 FROM information_schema.tables WHERE table_name='{table}')") #Determines if the employees table exists
                 return cur.fetchone()[0]
     except (psycopg2.DatabaseError, Exception) as error:
         print(error)
 
-#Creates the table for the sql database
+#Creates the employees table for the sql database
 def create_tables():
     command = ( #Command to create table. More standardized names.
         #SERIAL PRIMARY KEY might cause new emplyees to be skipped if they use default SERIAL number. 
@@ -60,7 +60,7 @@ def create_tables():
         config = load_config()
         with psycopg2.connect(**config) as conn:
             with conn.cursor() as cur:
-                if(not table_exists()): #If table doesn't exist
+                if(not table_exists("employees")): #If table doesn't exist
                     cur.execute(command)
                     print("Employees table created")
                 else: #Shouldn't happen from main function
@@ -115,7 +115,7 @@ def drop_table():
         sql = "DROP TABLE employees"
         with psycopg2.connect(**config) as conn:
             with conn.cursor() as cur:
-                if(table_exists()): #If table exists
+                if(table_exists("employees")): #If table exists
                     cur.execute(sql)
                     print("Table Employees dropped")
                 else:
@@ -130,7 +130,7 @@ def clear_table():
         sql = "TRUNCATE TABLE employees" #removes all data in employees
         with psycopg2.connect(**config) as conn:
             with conn.cursor() as cur:
-                if(table_exists()): #If table exists
+                if(table_exists("employees")): #If table exists
                     cur.execute(sql)
                     print("Table Employees truncated")
                 else:

@@ -60,3 +60,12 @@ def test_read_csv():
     results = csv_reader.read_csv("test.csv")
     assert results == [['1','41','Yes','Travel_Rarely','Sales','1','2','Life Sciences','2','Female','94','3','2','Sales Executive','Single',\
                         '19479','8','Yes','11','3','1','80','0','8','0','1','6','4','0','5']]
+    
+    with open("test.csv", "w") as file: #Test missing non-null catagory
+        file.write("Attrition,BusinessTravel,DailyRate,Department,DistanceFromHome,Education,EducationField,EmployeeCount,\
+        EmployeeNumber,EnvironmentSatisfaction,Gender,HourlyRate,JobInvolvement,JobLevel,JobRole,JobSatisfaction,MaritalStatus,\
+        MonthlyIncome,MonthlyRate,NumCompaniesWorked,Over18,OverTime,PercentSalaryHike,PerformanceRating,RelationshipSatisfaction,\
+        StandardHours,StockOptionLevel,TotalWorkingYears,TrainingTimesLastYear,WorkLifeBalance,YearsAtCompany,YearsInCurrentRole,\
+        YearsSinceLastPromotion,YearsWithCurrManager\n")
+        file.write(",Yes,Travel_Rarely,1102,Sales,1,2,Life Sciences,1,1,2,Female,94,3,2,Sales Executive,4,Single,5993,19479,8,Y,Yes,11,3,1,80,0,8,0,1,6,4,0,5")
+    assert csv_reader.read_csv("test.csv") is None
