@@ -109,17 +109,17 @@ def fill_database(input_list):
         print(f"Error: The following error occured trying to insert into the database: {error} on line {exc_tb.tb_lineno}")
 
 #Drops the employee table. Mostly used for resetting the employee table.
-def drop_table():
+def drop_table(table="employees"):
     try:
         config = load_config()
-        sql = "DROP TABLE employees"
+        sql = f"DROP TABLE {table}"
         with psycopg2.connect(**config) as conn:
             with conn.cursor() as cur:
-                if(table_exists()): #If table exists
+                if(table_exists(table)): #If table exists
                     cur.execute(sql)
-                    print("Table Employees dropped")
+                    print(f"Table {table} dropped")
                 else:
-                    print("Employees table does not exist")
+                    print(f"{table} table does not exist")
     except (psycopg2.DatabaseError, Exception) as e:
         print(f"Failed to drop table Employees: {e}")
 
