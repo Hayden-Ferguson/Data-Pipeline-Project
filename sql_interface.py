@@ -4,8 +4,8 @@ from config import load_config
 from psycopg2.extras import execute_values
 
 
-#Returns True if the provided table exists, returns False otherwise
-def table_exists(table):
+#Returns True if the provided table (default employees) exists, returns False otherwise
+def table_exists(table="employees"):
     try:
         config = load_config()
         with psycopg2.connect(**config) as conn:
@@ -60,7 +60,7 @@ def create_tables():
         config = load_config()
         with psycopg2.connect(**config) as conn:
             with conn.cursor() as cur:
-                if(not table_exists("employees")): #If table doesn't exist
+                if(not table_exists()): #If table doesn't exist
                     cur.execute(command)
                     print("Employees table created")
                 else: #Shouldn't happen from main function
@@ -115,7 +115,7 @@ def drop_table():
         sql = "DROP TABLE employees"
         with psycopg2.connect(**config) as conn:
             with conn.cursor() as cur:
-                if(table_exists("employees")): #If table exists
+                if(table_exists()): #If table exists
                     cur.execute(sql)
                     print("Table Employees dropped")
                 else:
@@ -130,7 +130,7 @@ def clear_table():
         sql = "TRUNCATE TABLE employees" #removes all data in employees
         with psycopg2.connect(**config) as conn:
             with conn.cursor() as cur:
-                if(table_exists("employees")): #If table exists
+                if(table_exists()): #If table exists
                     cur.execute(sql)
                     print("Table Employees truncated")
                 else:

@@ -165,7 +165,7 @@ def read_commands(commands):
             print("Invalid command/file")
 
 if __name__ == '__main__':
-    if not sql_interface.table_exists("employees"): #if the employees table doesn't exist, create it
+    if not sql_interface.table_exists(): #if the employees table doesn't exist, create it
         sql_interface.create_tables()
         with open("logger.txt", "a") as log: #log table creation
             log.write(f"\nemployees table created at {datetime.now()}\n")
