@@ -36,3 +36,15 @@ def test_get_csv_param():
     assert csv_reader.get_csv_param(value_list, 'c', catagoryDict) == 3
     assert csv_reader.get_csv_param(value_list, 'd', catagoryDict) == None
     assert csv_reader.get_csv_param(value_list, 'e', catagoryDict) == None
+
+def test_sort_csv_params():
+    value_list = [1,2,3,4]
+    catagoryDict = {'a': 0, 'b': 1, 'c':2, 'd':3}
+    catagoryList = ['b', 'c', 'a']
+    assert csv_reader.sort_csv_params(value_list, catagoryList, catagoryDict) == [2,3,1]
+
+    #Checks if None is handled
+    value_list = [1,None,3]
+    catagoryDict = {'a': 0, 'b': 1, 'c':2, 'd':None}
+    catagoryList = ['b', 'c', 'a']
+    assert csv_reader.sort_csv_params(value_list, catagoryList, catagoryDict) == [None,3,1]
