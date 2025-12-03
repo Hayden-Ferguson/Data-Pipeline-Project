@@ -16,14 +16,15 @@ def table_exists(table="employees"):
         print(error)
 
 #Creates the employees table for the sql database
-def create_tables():
+#Shoulde only be used to make employees, table variable for testing purposes
+def create_tables(table="employees"):
     command = ( #Command to create table. More standardized names.
         #SERIAL PRIMARY KEY might cause new emplyees to be skipped if they use default SERIAL number. 
         #over_18, daily_rate, monthly_income, and employee_count removed. years_with_curr_manager became years_with_current_manager
         #assume people who do not have all fields filled out are new employees
         #NOTE: Currently inserting Null into fields with DEFAULT
-        """
-        CREATE TABLE employees(
+        f"""
+        CREATE TABLE {table}(
             employee_number SERIAL PRIMARY KEY,
             age INTEGER NOT NULL CHECK (age > 17),
             attrition BOOLEAN DEFAULT FALSE,
@@ -60,11 +61,11 @@ def create_tables():
         config = load_config()
         with psycopg2.connect(**config) as conn:
             with conn.cursor() as cur:
-                if(not table_exists()): #If table doesn't exist
+                if(not table_exists(table)): #If table doesn't exist
                     cur.execute(command)
-                    print("Employees table created")
+                    print(f"{table} table created")
                 else: #Shouldn't happen from main function
-                    print("Employees table already exists")
+                    print(f"{table} table already exists")
     except (psycopg2.DatabaseError, Exception) as error:
         print(error)
 

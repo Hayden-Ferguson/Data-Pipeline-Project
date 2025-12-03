@@ -14,7 +14,16 @@ def test_table_exists():
         print(error)
     
     assert sql_interface.table_exists("test") == True
+    sql_interface.drop_table("test") #assume this works because of later test
     assert sql_interface.table_exists("nonexistant") == False
+
+def test_create_tables():
+    if sql_interface.table_exists("test"):
+        sql_interface.drop_table("test")
+    sql_interface.create_tables("test")
+    assert sql_interface.table_exists("test") == True #assume this works because of previous test
+    sql_interface.drop_table("test") #assume this works because of later test
+    #the latter only matters to reduce tables
 
 def test_drop_table():
     try:
