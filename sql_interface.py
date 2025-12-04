@@ -72,8 +72,8 @@ def create_tables(table="employees"):
         
 
 #Fills database with values given a list of inputs that contain ordered parameters. Returns updates and inserts for logging purposes.
-def fill_database(input_list):
-    sql = "INSERT INTO employees(employee_number, age, attrition, business_travel, department, distance_from_home," \
+def fill_database(input_list, table="employees"): #table for testing purposes
+    sql = f"INSERT INTO {table}(employee_number, age, attrition, business_travel, department, distance_from_home," \
     "education, education_field, environment_satisfaction, gender, hourly_rate, job_involvement, job_level," \
     "job_role, marital_status, monthly_rate, num_companies_worked, overtime, percent_salary_hike, performance_rating," \
     "relationship_satisfaction, standard_hours, stock_option_level, total_working_years, training_times_last_year," \
@@ -94,17 +94,21 @@ def fill_database(input_list):
     "RETURNING (xmax=0) AS inserted;"
     config = load_config()
     try:
-        with  psycopg2.connect(**config) as conn:
-            with  conn.cursor() as cur:
-                #cur.executemany(sql, input_list)
-                execute_values(cur, sql, input_list, page_size=len(input_list))
-                results = cur.fetchall()
+        if table_exists(table):
+            with  psycopg2.connect(**config) as conn:
+                with  conn.cursor() as cur:
+                    #cur.executemany(sql, input_list)
+                    execute_values(cur, sql, input_list, page_size=len(input_list))
+                    results = cur.fetchall()
 
-            conn.commit()
-            inserted = sum(inserted for (inserted,) in results)
-            updated = len(results) - inserted
-            print(f"Employee table updated {updated} rows and inserted {inserted} rows.")
-            return (inserted, updated)
+                conn.commit()
+                inserted = sum(inserted for (inserted,) in results)
+                updated = len(results) - inserted
+                print(f"Employee table updated {updated} rows and inserted {inserted} rows.")
+                return (inserted, updated)
+        else:
+            print(f"Error: Tried filling table {table}, which doesn't exist")
+            return (None, None)
     except (Exception, psycopg2.DatabaseError) as error:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         print(f"Error: The following error occured trying to insert into the database: {error} on line {exc_tb.tb_lineno}")
