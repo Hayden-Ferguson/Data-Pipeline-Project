@@ -129,19 +129,19 @@ def drop_table(table="employees"):
         print(f"Failed to drop table Employees: {e}")
 
 #Clears/Truncates the employee table of data. Mostly used for resetting the employee table data.
-def clear_table():
+def clear_table(table="employees"):
     try:
         config = load_config()
-        sql = "TRUNCATE TABLE employees" #removes all data in employees
+        sql = f"TRUNCATE TABLE {table}" #removes all data in employees
         with psycopg2.connect(**config) as conn:
             with conn.cursor() as cur:
                 if(table_exists()): #If table exists
                     cur.execute(sql)
-                    print("Table Employees truncated")
+                    print(f"Table {table} truncated")
                 else:
-                    print("Employees table does not exist")
+                    print(f"{table} table does not exist")
     except (psycopg2.DatabaseError, Exception) as e:
-        print(f"Failed to clear table Employees: {e}")
+        print(f"Failed to clear table {table}: {e}")
 
 #Reads the table and prints it line by line
 def read_table():

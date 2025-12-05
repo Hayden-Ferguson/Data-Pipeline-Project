@@ -4,6 +4,9 @@ from config import load_config
 from psycopg2.extras import execute_values
 import pytest # pyright: ignore[reportMissingImports]
 
+#NOTE: These tests are heavily intertwined, due to using one function to help test another.
+# Even if a test passes, the function might be wrong if another test fails.
+
 def test_table_exists():
     try:
         config = load_config()
@@ -80,6 +83,20 @@ def test_drop_table():
     assert sql_interface.table_exists("test") == True
     sql_interface.drop_table("test") #table did existed, but no longer exists
     assert sql_interface.table_exists("test") == False
+
+def test_clear_table():
+    if sql_interface.table_exists("test"):
+        sql_interface.drop_table("test")
+    sql_interface.create_tables("test")
+
+    input_list = [['1', '41', 'Yes', 'Travel_Rarely', 'Sales', '1', '2', 'Life Sciences', '2', 'Female', '94', '3', '2',\
+                   'Sales Executive', 'Single', '19479', '8', 'Yes', '11', '3', '1', '80', '0', '8', '0', '1', '6', '4', '0', '5'],\
+                    ['2', '41', 'Yes', 'Travel_Rarely', 'Sales', '1', '2', 'Life Sciences', '2', 'Female', '94', '3', '2',\
+                   'Sales Executive', 'Single', '19479', '8', 'Yes', '11', '3', '1', '80', '0', '8', '0', '1', '6', '4', '0', '5']]
+    insert, update = sql_interface.fill_database(input_list, "test")
+    assert sql_interface.count_rows("test") == 2
+    sql_interface.clear_table("test")
+    assert sql_interface.count_rows("test") == 0
 
 #Mostly to prove that the debugging function used in other tests works properly
 def test_count_rows():
