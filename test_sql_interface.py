@@ -40,13 +40,22 @@ def test_fill_database():
     assert insert == 0
     assert update == 1
 
+    #Can handle multiple inputs and inserting while updating
+    input_list = [['1', '41', 'Yes', 'Travel_Rarely', 'Sales', '1', '2', 'Life Sciences', '2', 'Female', '94', '3', '2',\
+                   'Sales Executive', 'Single', '19479', '8', 'Yes', '11', '3', '1', '80', '0', '8', '0', '1', '6', '4', '0', '5'],\
+                    ['2', '41', 'Yes', 'Travel_Rarely', 'Sales', '1', '2', 'Life Sciences', '2', 'Female', '94', '3', '2',\
+                   'Sales Executive', 'Single', '19479', '8', 'Yes', '11', '3', '1', '80', '0', '8', '0', '1', '6', '4', '0', '5']]
+    insert, update = sql_interface.fill_database(input_list, "test")
+    assert insert == 1
+    assert update == 1
+
     sql_interface.drop_table("test") #assume this works because of later test
 
 
 def test_drop_table():
     sql_interface.create_tables("test")
     assert sql_interface.table_exists("test") == True
-    sql_interface.drop_table("test")
+    sql_interface.drop_table("test") #table did exist, no longer exists
     assert sql_interface.table_exists("test") == False
 
 
