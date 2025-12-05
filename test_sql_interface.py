@@ -9,7 +9,7 @@ def test_table_exists():
         config = load_config()
         with psycopg2.connect(**config) as conn:
             with conn.cursor() as cur:
-                cur.execute("CREATE TABLE test ()")
+                cur.execute("CREATE TABLE test (a INT)")
     except (psycopg2.DatabaseError, Exception) as error:
         print(error)
     
@@ -35,21 +35,42 @@ def test_fill_database():
     insert, update = sql_interface.fill_database(input_list, "test")
     assert insert == 1
     assert update == 0
+
     insert, update = sql_interface.fill_database(input_list, "test")
     assert insert == 0
     assert update == 1
+
     sql_interface.drop_table("test") #assume this works because of later test
 
 
 def test_drop_table():
+    sql_interface.create_tables("test")
+    assert sql_interface.table_exists("test") == True
+    sql_interface.drop_table("test")
+    assert sql_interface.table_exists("test") == False
+
+
+def test_count_rows():
+    if sql_interface.table_exists("test"):
+        sql_interface.drop_table("test")
+    command = (
+        '''
+        CREATE TABLE "test"(
+            a INT,
+            b CHAR
+        )
+        ''')
     try:
         config = load_config()
         with psycopg2.connect(**config) as conn:
             with conn.cursor() as cur:
-                cur.execute("CREATE TABLE test ()")
+                cur.execute(command)
+                conn.commit()
+                assert sql_interface.count_rows("test") == 0
+                cur.execute("INSERT INTO test(a, b) VALUES (6, 'a');")
+                conn.commit()
     except (psycopg2.DatabaseError, Exception) as error:
         print(error)
         
-    assert sql_interface.table_exists("test") == True
+    assert sql_interface.count_rows("test") == 1
     sql_interface.drop_table("test")
-    assert sql_interface.table_exists("test") == False

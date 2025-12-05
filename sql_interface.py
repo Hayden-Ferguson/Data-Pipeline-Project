@@ -157,3 +157,17 @@ def read_table():
     except (Exception, psycopg2.DatabaseError) as error:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         print(f"Error: The following error occured trying to read the database: {error} on line {exc_tb.tb_lineno}")
+
+#Counts the number of rows in the provided table. Mostly for testing purposes
+def count_rows(table="employees"):
+    config = load_config()
+    try:
+        with  psycopg2.connect(**config) as conn:
+            with  conn.cursor() as cur:
+                cur.execute(f"SELECT COUNT(*) FROM {table}")
+                rows = cur.fetchone()[0]
+                return rows
+
+    except (Exception, psycopg2.DatabaseError) as error:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        print(f"Error: The following error occured trying to count rows: {error} on line {exc_tb.tb_lineno}")
