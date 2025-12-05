@@ -35,10 +35,12 @@ def test_fill_database():
     insert, update = sql_interface.fill_database(input_list, "test")
     assert insert == 1
     assert update == 0
+    assert sql_interface.count_rows("test") == 1
 
     insert, update = sql_interface.fill_database(input_list, "test")
     assert insert == 0
     assert update == 1
+    assert sql_interface.count_rows("test") == 1
 
     #Can handle multiple inputs and inserting while updating
     input_list = [['1', '41', 'Yes', 'Travel_Rarely', 'Sales', '1', '2', 'Life Sciences', '2', 'Female', '94', '3', '2',\
@@ -48,6 +50,27 @@ def test_fill_database():
     insert, update = sql_interface.fill_database(input_list, "test")
     assert insert == 1
     assert update == 1
+    assert sql_interface.count_rows("test") == 2
+
+    #Can handle multiple updates
+    input_list = [['1', '41', 'Yes', 'Travel_Rarely', 'Sales', '1', '2', 'Life Sciences', '2', 'Female', '94', '3', '2',\
+                   'Sales Executive', 'Single', '19479', '8', 'Yes', '11', '3', '1', '80', '0', '8', '0', '1', '6', '4', '0', '5'],\
+                    ['2', '41', 'Yes', 'Travel_Rarely', 'Sales', '1', '2', 'Life Sciences', '2', 'Female', '94', '3', '2',\
+                   'Sales Executive', 'Single', '19479', '8', 'Yes', '11', '3', '1', '80', '0', '8', '0', '1', '6', '4', '0', '5']]
+    insert, update = sql_interface.fill_database(input_list, "test")
+    assert insert == 0
+    assert update == 2
+    assert sql_interface.count_rows("test") == 2
+
+    #Can handle multiple inputs
+    input_list = [['3', '41', 'Yes', 'Travel_Rarely', 'Sales', '1', '2', 'Life Sciences', '2', 'Female', '94', '3', '2',\
+                   'Sales Executive', 'Single', '19479', '8', 'Yes', '11', '3', '1', '80', '0', '8', '0', '1', '6', '4', '0', '5'],\
+                    ['4', '41', 'Yes', 'Travel_Rarely', 'Sales', '1', '2', 'Life Sciences', '2', 'Female', '94', '3', '2',\
+                   'Sales Executive', 'Single', '19479', '8', 'Yes', '11', '3', '1', '80', '0', '8', '0', '1', '6', '4', '0', '5']]
+    insert, update = sql_interface.fill_database(input_list, "test")
+    assert insert == 2
+    assert update == 0
+    assert sql_interface.count_rows("test") == 4
 
     sql_interface.drop_table("test") #assume this works because of later test
 
@@ -55,10 +78,10 @@ def test_fill_database():
 def test_drop_table():
     sql_interface.create_tables("test")
     assert sql_interface.table_exists("test") == True
-    sql_interface.drop_table("test") #table did exist, no longer exists
+    sql_interface.drop_table("test") #table did existed, but no longer exists
     assert sql_interface.table_exists("test") == False
 
-
+#Mostly to prove that the debugging function used in other tests works properly
 def test_count_rows():
     if sql_interface.table_exists("test"):
         sql_interface.drop_table("test")
