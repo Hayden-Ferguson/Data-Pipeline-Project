@@ -1,4 +1,5 @@
 import src.csv_reader as csv_reader
+import os
 import pytest # pyright: ignore[reportMissingImports]
 
 def test_get_catagory_dict():
@@ -69,3 +70,4 @@ def test_read_csv():
         YearsSinceLastPromotion,YearsWithCurrManager\n")
         file.write(",Yes,Travel_Rarely,1102,Sales,1,2,Life Sciences,1,1,2,Female,94,3,2,Sales Executive,4,Single,5993,19479,8,Y,Yes,11,3,1,80,0,8,0,1,6,4,0,5")
     assert csv_reader.read_csv("data/test.csv") is None
+    os.remove("data/test.csv")

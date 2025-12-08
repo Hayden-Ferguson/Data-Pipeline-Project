@@ -2,6 +2,7 @@ import src.sql_interface as sql_interface
 import psycopg2
 from src.config import load_config
 from psycopg2.extras import execute_values
+import os
 import pytest # pyright: ignore[reportMissingImports]
 
 #NOTE: These tests are heavily intertwined, due to using one function to help test another.
@@ -132,6 +133,7 @@ def test_read_table():
         print(error)
 
     sql_interface.drop_table("test")
+    os.remove("test_output.txt")
 
 #Mostly to prove that the debugging function used in other tests works properly
 def test_count_rows():
