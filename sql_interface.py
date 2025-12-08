@@ -143,20 +143,22 @@ def clear_table(table="employees"):
     except (psycopg2.DatabaseError, Exception) as e:
         print(f"Failed to clear table {table}: {e}")
 
-#Reads the table and prints it line by line
-def read_table():
+#Reads the table and prints it line by line in tuple form, as well as write it in filename
+def read_table(table="employees", filename="sql_reader.txt"):
     config = load_config()
     try:
         with  psycopg2.connect(**config) as conn:
             with  conn.cursor() as cur:
-                cur.execute("SELECT * FROM employees")
+                cur.execute(f"SELECT * FROM {table}")
                 rows = cur.fetchall()
-                for row in rows:
-                    print(row)
+                with open(filename, "w+") as reader: #TODO: make this print catagories first
+                    for row in rows:
+                        print(row)
+                        reader.write(f"{str(row)}\n")
 
     except (Exception, psycopg2.DatabaseError) as error:
         exc_type, exc_obj, exc_tb = sys.exc_info()
-        print(f"Error: The following error occured trying to read the database: {error} on line {exc_tb.tb_lineno}")
+        print(f"Error: The following error occured trying to read the table {table}: {error} on line {exc_tb.tb_lineno}")
 
 #Counts the number of rows in the provided table. Mostly for testing purposes
 def count_rows(table="employees"):

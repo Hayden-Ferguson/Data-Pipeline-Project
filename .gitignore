@@ -3,3 +3,4 @@ logger.txt
 rejection_log.txt
 __pycache__/
 test.csv
+sql_reader.txt

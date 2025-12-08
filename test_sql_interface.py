@@ -93,7 +93,7 @@ def test_clear_table():
                    'Sales Executive', 'Single', '19479', '8', 'Yes', '11', '3', '1', '80', '0', '8', '0', '1', '6', '4', '0', '5'],\
                     ['2', '41', 'Yes', 'Travel_Rarely', 'Sales', '1', '2', 'Life Sciences', '2', 'Female', '94', '3', '2',\
                    'Sales Executive', 'Single', '19479', '8', 'Yes', '11', '3', '1', '80', '0', '8', '0', '1', '6', '4', '0', '5']]
-    insert, update = sql_interface.fill_database(input_list, "test")
+    sql_interface.fill_database(input_list, "test")
     assert sql_interface.count_rows("test") == 2
     sql_interface.clear_table("test")
     assert sql_interface.count_rows("test") == 0
