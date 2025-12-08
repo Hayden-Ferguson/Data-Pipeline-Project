@@ -125,7 +125,7 @@ def check_all_valid(inputs):
     return (tuple(valid), tuple(invalid))
 
 #Does all the stuff that needs to be done when upsert is called, given sorted inputs and filename
-def upsert_call(inputs, filename):
+def upsert_call(inputs, filename, table="employees"):
     try:
         logger.log_start(filename, len(inputs), filename)
         filtered = filter_inputs(inputs)
@@ -133,7 +133,7 @@ def upsert_call(inputs, filename):
         logger.log_validation(filename, validated)
         logger.log_rejects(validated[1])
         start = datetime.now()
-        results = sql_interface.fill_database(validated[0]) #Fill database with valid results
+        results = sql_interface.fill_database(validated[0], table) #Fill database with valid results
         logger.log_load(filename, results[0], results[1], start)
         logger.log_end(filename)
     except Exception as e:
@@ -142,23 +142,23 @@ def upsert_call(inputs, filename):
         print(f"Error: The following error occured trying to upsert from {filename}: {e} on line {exc_tb.tb_lineno} in {file_name}")
 
 #Takes a list of commands and performs them, reading any csv or json files given
-def read_commands(commands):
+def read_commands(commands, table="employees"):
     for command in commands:
         if command.endswith(".csv"):
-            inputs = csv_reader.read_csv(command)
+            inputs = csv_reader.read_csv(command, table)
             if inputs is not None:
                 upsert_call(inputs, command)
         elif command.endswith(".json"):
-            inputs = json_reader.read_json(command) #TODO: check if None return possible
+            inputs = json_reader.read_json(command, table) #TODO: check if None return possible
             upsert_call(inputs, command)
         elif command.lower() == "drop":
-            sql_interface.drop_table()
+            sql_interface.drop_table(table)
             with open("logger.txt", "a") as log: #log dropping table
                 log.write(f"\nemployees table dropped at {datetime.now()}\n")
         elif command.lower() == "read":
-            sql_interface.read_table()
+            sql_interface.read_table(table)
         elif command.lower() == "clear" or command.lower() == "truncate":
-            sql_interface.clear_table()
+            sql_interface.clear_table(table)
             with open("logger.txt", "a") as log: #log truncating table
                 log.write(f"\nemployees table truncated at {datetime.now()}\n")
         else:
