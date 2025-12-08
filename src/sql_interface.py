@@ -1,6 +1,6 @@
 import psycopg2
 import sys
-from config import load_config
+from .config import load_config
 from psycopg2.extras import execute_values
 
 

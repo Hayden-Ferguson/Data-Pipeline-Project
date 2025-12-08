@@ -4,10 +4,10 @@ import os
 #import pandas as pd
 from datetime import datetime
 
-import csv_reader
-import json_reader
-import sql_interface
-import logger
+import src.csv_reader as csv_reader
+import src.json_reader as json_reader
+import src.sql_interface as sql_interface
+import src.logger as logger
 
 #NOTE: robust inputs, can recognize caragory names despite differences with capitalization or underscores.
 #TODO: incorporate machine learning to predict quitting

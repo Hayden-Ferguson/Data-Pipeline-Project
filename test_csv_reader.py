@@ -1,4 +1,4 @@
-import csv_reader
+import src.csv_reader as csv_reader
 import pytest # pyright: ignore[reportMissingImports]
 
 def test_get_catagory_dict():

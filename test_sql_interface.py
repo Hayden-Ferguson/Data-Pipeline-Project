@@ -1,6 +1,6 @@
-import sql_interface
+import src.sql_interface as sql_interface
 import psycopg2
-from config import load_config
+from src.config import load_config
 from psycopg2.extras import execute_values
 import pytest # pyright: ignore[reportMissingImports]
 

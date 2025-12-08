@@ -1,4 +1,4 @@
-import logger
+import src.logger as logger
 import re
 import os
 from datetime import datetime
