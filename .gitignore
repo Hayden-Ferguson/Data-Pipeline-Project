@@ -4,3 +4,4 @@ rejection_log.txt
 __pycache__/
 test.csv
 sql_reader.txt
+test_output.txt

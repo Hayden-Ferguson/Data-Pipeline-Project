@@ -99,6 +99,40 @@ def test_clear_table():
     assert sql_interface.count_rows("test") == 0
 
 #Mostly to prove that the debugging function used in other tests works properly
+def test_read_table():
+    if sql_interface.table_exists("test"):
+        sql_interface.drop_table("test")
+    command = (
+        '''
+        CREATE TABLE "test"(
+            a INT,
+            b CHAR
+        )
+        ''')
+    try:
+        config = load_config()
+        with psycopg2.connect(**config) as conn:
+            with conn.cursor() as cur:
+                cur.execute(command)
+                conn.commit()
+                assert sql_interface.count_rows("test") == 0
+                cur.execute("INSERT INTO test(a, b) VALUES (6, 'a');")
+                conn.commit()
+
+                sql_interface.read_table("test", "test_output.txt")
+                with open("test_output.txt", "r") as output:
+                    assert output.readlines() == ["(6, 'a')\n"] #readlines() gives list of lines
+
+                    #test mutliple inputs
+                    cur.execute("INSERT INTO test(a, b) VALUES (7, 'b');")
+                    assert output.readlines() == ["(6, 'a')\n", "(7, 'b')\n"]
+
+    except (psycopg2.DatabaseError, Exception) as error:
+        print(error)
+
+    sql_interface.drop_table("test")
+
+#Mostly to prove that the debugging function used in other tests works properly
 def test_count_rows():
     if sql_interface.table_exists("test"):
         sql_interface.drop_table("test")
