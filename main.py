@@ -21,7 +21,7 @@ catagoryList=["employee_number", "age", "attrition", "business_travel", "departm
     "relationship_satisfaction", "standard_hours", "stock_option_level", "total_working_years", "training_times_last_year", \
     "work_life_balance", "years_at_company", "years_in_current_role", "years_since_last_promotion", "years_with_current_manager"]
 
-#Given a tuple of inputs, replace empty string with None. TODO: Would set to DEFAULT with sql.SQL("DEFAULT"), but interferes with other functions.
+#Given a list of inputs, replace empty string with None. TODO: Would set to DEFAULT with sql.SQL("DEFAULT"), but interferes with other functions.
 def filter_inputs(input_list):
     params = len(input_list[0])
     filtered = input_list.copy() #Avoid modifying the original
@@ -79,17 +79,17 @@ def check_valid(value_list):
         if not (type(value_list[1]) == int or re.match(r'^[+-]?[0-9]+$', value_list[1])) or int(value_list[1]) < 18: #Not an adult or non-integer
             return (False, f"age is {value_list[1]}, which is below 18 or not an integer")
         
-        if len(value_list[3])>20: #buisness_travel is too long
+        if value_list[3] is not None and len(value_list[3])>20: #buisness_travel is too long
             return (False, f"buisness_travel is {value_list[3]}, which is too long")
-        if len(value_list[4])>30: #department is too long
+        if value_list[4] is not None and len(value_list[4])>30: #department is too long
             return (False, f"department is {value_list[4]}, which is too long")
-        if len(value_list[7])>30: #education_field is too long
+        if value_list[7] is not None and len(value_list[7])>30: #education_field is too long
             return (False, f"education_field is {value_list[7]}, which is too long")
-        if len(value_list[9])>20: #gender is too long
+        if value_list[9] is not None and len(value_list[9])>20: #gender is too long
             return (False, f"gender is {value_list[9]}, which is too long")
-        if len(value_list[13])>30: #job_role is too long
+        if value_list[13] is not None and len(value_list[13])>30: #job_role is too long
             return (False, f"job_role is {value_list[13]}, which is too long")
-        if len(value_list[14])>10: #marital_status is too long
+        if value_list[14] is not None and len(value_list[14])>10: #marital_status is too long
             return (False, f"marital_status is {value_list[14]}, which is too long")
         
         nonNegativeCatagories = [5, 10, 15, 16, 21, 22, 23, 24, 26, 27, 28, 29]
