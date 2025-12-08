@@ -6,6 +6,7 @@ import pytest # pyright: ignore[reportMissingImports]
 
 #NOTE: These tests are heavily intertwined, due to using one function to help test another.
 # Even if a test passes, the function might be wrong if another test fails.
+# Some code commented out beccause they shouldn't be activated and are lowering test coverage
 
 def test_table_exists():
     try:
@@ -21,16 +22,16 @@ def test_table_exists():
     assert sql_interface.table_exists("nonexistant") == False
 
 def test_create_tables():
-    if sql_interface.table_exists("test"):
-        sql_interface.drop_table("test")
+    #if sql_interface.table_exists("test"):
+    #    sql_interface.drop_table("test")
     sql_interface.create_tables("test")
     assert sql_interface.table_exists("test") == True #assume this works because of previous test
     sql_interface.drop_table("test") #assume this works because of later test
     #TODO: Check table structure
 
 def test_fill_database():
-    if sql_interface.table_exists("test"):
-        sql_interface.drop_table("test")
+    #if sql_interface.table_exists("test"):
+    #    sql_interface.drop_table("test")
     sql_interface.create_tables("test")
     input_list = [['1', '41', 'Yes', 'Travel_Rarely', 'Sales', '1', '2', 'Life Sciences', '2', 'Female', '94', '3', '2',\
                    'Sales Executive', 'Single', '19479', '8', 'Yes', '11', '3', '1', '80', '0', '8', '0', '1', '6', '4', '0', '5']]
