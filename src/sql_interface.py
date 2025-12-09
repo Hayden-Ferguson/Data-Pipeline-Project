@@ -1,6 +1,7 @@
 import psycopg2
 import sys
 import os
+import pandas as pd
 from .config import load_config
 from psycopg2.extras import execute_values
 
@@ -171,6 +172,19 @@ def count_rows(table="employees"):
                 cur.execute(f"SELECT COUNT(*) FROM {table}")
                 rows = cur.fetchone()[0]
                 return rows
+
+    except (Exception, psycopg2.DatabaseError) as error:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        print(f"Error: The following error occured trying to count rows: {error} on line {exc_tb.tb_lineno}")
+
+#Gets pandas dataframe from table, used for machine learning
+def get_dataframe(table="employees"):
+    config = load_config()
+    try:
+        with  psycopg2.connect(**config) as conn:
+            with  conn.cursor() as cur:
+                dataframe = pd.read_sql_query(f'SELECT * FROM "{table}"', conn)
+        return dataframe
 
     except (Exception, psycopg2.DatabaseError) as error:
         exc_type, exc_obj, exc_tb = sys.exc_info()
