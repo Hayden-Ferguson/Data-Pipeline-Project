@@ -25,7 +25,7 @@ def log_end(source, status="success", file="logger.txt"):
 
 #Logs rejected data with reasons. This goes to a rejection_log.txt instead of logger.txt
 #TODO: if possible change to a reject SQL table
-def log_rejects(rejections, file="logger.txt"):
+def log_rejects(rejections, file="rejection_log.txt"):
     if len(rejections)>0: #If there are rejections
         with open(file, "a") as logger:
             logger.write(f"\n-----{datetime.now()}-----\n")

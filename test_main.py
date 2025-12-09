@@ -1,4 +1,6 @@
 import main
+import src.sql_interface as sql_interface
+import time
 import pytest # pyright: ignore[reportMissingImports]
 
 def test_filter_inputs():
@@ -197,3 +199,24 @@ def test_check_all_valid():
              'Divorced', 10195, 1, False, 11, 3, 3, 80, 1, 10, 1, 3, 10, 9, 8, 8), "Duplicate primary key")
     assert results[1][1] == ((None, 29, False, 'Travel_Rarely', 'Research & Development', 21, 4, 'Life Sciences', 2, 'Female', 51, 4, 3, 'Manufacturing Director', \
              'Divorced', 10195, 1, False, 11, 3, 3, 80, 1, 10, 1, 3, 10, 9, 8, 8), "employee_number is Null")
+    
+def test_upsert_call(): #uses sql_interface functions for simplicity #TODO: check last lines of log
+    sql_interface.create_tables("test")
+    inputs = []
+    inputs.append((20, 29, False, 'Travel_Rarely', 'Research & Development', 21, 4, 'Life Sciences', 2, 'Female', 51, 4, 3, 'Manufacturing Director', \
+             'Divorced', 10195, 1, False, 11, 3, 3, 80, 1, 10, 1, 3, 10, 9, 8, 8))
+    inputs.append((20, 29, False, 'Travel_Rarely', 'Research & Development', 21, 4, 'Life Sciences', 2, 'Female', 51, 4, 3, 'Manufacturing Director', \
+             'Divorced', 10195, 1, False, 11, 3, 3, 80, 1, 10, 1, 3, 10, 9, 8, 8))
+    inputs.append((21, 29, False, 'Travel_Rarely', 'Research & Development', 21, 4, 'Life Sciences', 2, 'Female', 51, 4, 3, 'Manufacturing Director', \
+             'Divorced', 10195, 1, False, 11, 3, 3, 80, 1, 10, 1, 3, 10, 9, 8, 8))
+    main.upsert_call(inputs, "s", "test")
+    
+    assert sql_interface.count_rows("test") == 2
+    inputs = []
+    inputs.append((20, 29, False, 'Travel_Rarely', 'Research & Development', 21, 4, 'Life Sciences', 2, 'Female', 51, 4, 3, 'Manufacturing Director', \
+             'Divorced', 10195, 1, False, 11, 3, 3, 80, 1, 10, 1, 3, 10, 9, 8, 8)) #testing updates
+    inputs.append((22, 29, False, 'Travel_Rarely', 'Research & Development', 21, 4, 'Life Sciences', 2, 'Female', 51, 4, 3, 'Manufacturing Director', \
+             'Divorced', 10195, 1, False, 11, 3, 3, 80, 1, 10, 1, 3, 10, 9, 8, 8))
+    main.upsert_call(inputs, "s", "test")
+    assert sql_interface.count_rows("test") == 3
+    sql_interface.drop_table("test")

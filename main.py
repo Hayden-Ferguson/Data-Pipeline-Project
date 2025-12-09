@@ -124,7 +124,7 @@ def check_all_valid(inputs):
             invalid.append((input, validity[1]))
     return (tuple(valid), tuple(invalid))
 
-#Does all the stuff that needs to be done when upsert is called, given sorted inputs and filename
+#Does all the stuff that needs to be done when upsert is called, given a list of sorted inputs and filename
 def upsert_call(inputs, filename, table="employees"):
     try:
         logger.log_start(filename, len(inputs), filename)
