@@ -1,5 +1,6 @@
 import psycopg2
 import sys
+import os
 from .config import load_config
 from psycopg2.extras import execute_values
 
@@ -111,7 +112,8 @@ def fill_database(input_list, table="employees"): #table for testing purposes
             return (None, None)
     except (Exception, psycopg2.DatabaseError) as error:
         exc_type, exc_obj, exc_tb = sys.exc_info()
-        print(f"Error: The following error occured trying to insert into the database: {error} on line {exc_tb.tb_lineno}")
+        file_name = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+        print(f"Error: The following error occured trying to insert into the database: {error} on line {exc_tb.tb_lineno} in {file_name}")
 
 #Drops the employee table. Mostly used for resetting the employee table.
 def drop_table(table="employees"):

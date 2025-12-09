@@ -1,6 +1,6 @@
 import main
 import src.sql_interface as sql_interface
-import time
+import os
 import pytest # pyright: ignore[reportMissingImports]
 
 def test_filter_inputs():
@@ -201,6 +201,8 @@ def test_check_all_valid():
              'Divorced', 10195, 1, False, 11, 3, 3, 80, 1, 10, 1, 3, 10, 9, 8, 8), "employee_number is Null")
     
 def test_upsert_call(): #uses sql_interface functions for simplicity #TODO: check last lines of log
+    if sql_interface.table_exists("test"):
+        sql_interface.drop_table("test")
     sql_interface.create_tables("test")
     inputs = []
     inputs.append((20, 29, False, 'Travel_Rarely', 'Research & Development', 21, 4, 'Life Sciences', 2, 'Female', 51, 4, 3, 'Manufacturing Director', \
@@ -220,3 +222,28 @@ def test_upsert_call(): #uses sql_interface functions for simplicity #TODO: chec
     main.upsert_call(inputs, "s", "test")
     assert sql_interface.count_rows("test") == 3
     sql_interface.drop_table("test")
+
+def test_read_commands():
+    if sql_interface.table_exists("test"):
+        sql_interface.drop_table("test")
+    sql_interface.create_tables("test")
+    
+    with open("data/test.csv", "w") as file:
+        file.write("Age,Attrition,BusinessTravel,DailyRate,Department,DistanceFromHome,Education,EducationField,EmployeeCount,\
+        EmployeeNumber,EnvironmentSatisfaction,Gender,HourlyRate,JobInvolvement,JobLevel,JobRole,JobSatisfaction,MaritalStatus,\
+        MonthlyIncome,MonthlyRate,NumCompaniesWorked,Over18,OverTime,PercentSalaryHike,PerformanceRating,RelationshipSatisfaction,\
+        StandardHours,StockOptionLevel,TotalWorkingYears,TrainingTimesLastYear,WorkLifeBalance,YearsAtCompany,YearsInCurrentRole,\
+        YearsSinceLastPromotion,YearsWithCurrManager\n")
+        file.write("41,Yes,Travel_Rarely,1102,Sales,1,2,Life Sciences,1,1,2,Female,94,3,2,Sales Executive,4,Single,5993,19479,8,Y,Yes,11,3,1,80,0,8,0,1,6,4,0,5")
+    main.read_commands(["data/test.csv"], "test")
+    assert sql_interface.count_rows("test") == 1
+    main.read_commands(["read"], "test")
+    with open("sql_reader.txt", "r") as output:
+        assert output.readlines() == ["(1, 41, True, 'Travel_Rarely', 'Sales', 1, 2, 'Life Sciences', 2, 'Female', 94, 3, 2, 'Sales Executive',"\
+                                      " 'Single', 19479, 8, True, 11, 3, 1, 80, 0, 8, 0, 1, 6, 4, 0, 5)\n"]
+    main.read_commands(["clear"], "test")
+    assert sql_interface.count_rows("test") == 0
+    #TODO: Make json command
+    main.read_commands(["drop"], "test")
+    assert sql_interface.table_exists("test") == False
+    os.remove("data/test.csv")

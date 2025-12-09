@@ -145,12 +145,12 @@ def upsert_call(inputs, filename, table="employees"):
 def read_commands(commands, table="employees"):
     for command in commands:
         if command.endswith(".csv"):
-            inputs = csv_reader.read_csv(command, table)
+            inputs = csv_reader.read_csv(command)
             if inputs is not None:
-                upsert_call(inputs, command)
+                upsert_call(inputs, command, table)
         elif command.endswith(".json"):
-            inputs = json_reader.read_json(command, table) #TODO: check if None return possible
-            upsert_call(inputs, command)
+            inputs = json_reader.read_json(command) #TODO: check if None return possible
+            upsert_call(inputs, command, table)
         elif command.lower() == "drop":
             sql_interface.drop_table(table)
             with open("logger.txt", "a") as log: #log dropping table
