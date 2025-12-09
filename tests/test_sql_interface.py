@@ -3,6 +3,8 @@ import psycopg2
 from src.config import load_config
 from psycopg2.extras import execute_values
 import os
+import pandas as pd
+import warnings
 import pytest # pyright: ignore[reportMissingImports]
 
 #NOTE: These tests are heavily intertwined, due to using one function to help test another.
@@ -160,3 +162,30 @@ def test_count_rows():
         
     assert sql_interface.count_rows("test") == 1
     sql_interface.drop_table("test")
+
+def test_get_dataframe():
+    if sql_interface.table_exists("test"):
+        sql_interface.drop_table("test")
+    #Ignore following warning, probably won't matter given simple nature of the table
+    warnings.filterwarnings("ignore", category=UserWarning, message=".*pandas only supports SQLAlchemy.*")
+    command = (
+        '''
+        CREATE TABLE "test"(
+            a INT,
+            b CHAR
+        )
+        ''')
+    try:
+        config = load_config()
+        with psycopg2.connect(**config) as conn:
+            with conn.cursor() as cur:
+                cur.execute(command)
+                conn.commit()
+                assert sql_interface.count_rows("test") == 0
+                cur.execute("INSERT INTO test(a, b) VALUES (6, 'a');")
+                conn.commit()
+    except (psycopg2.DatabaseError, Exception) as error:
+        print(error)
+
+    dataframe = pd.DataFrame({'a':[6], 'b':['a']})
+    assert sql_interface.get_dataframe("test").equals(dataframe)
