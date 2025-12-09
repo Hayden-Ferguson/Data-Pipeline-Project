@@ -11,12 +11,12 @@ catagoryList=["employee_number", "age", "attrition", "business_travel", "departm
     "relationship_satisfaction", "standard_hours", "stock_option_level", "total_working_years", "training_times_last_year", \
     "work_life_balance", "years_at_company", "years_in_current_role", "years_since_last_promotion", "years_with_current_manager"]
 
-#converts dictionaries from json to ordered list given a list of dictionaries
-def convert_json(dictionaries):
+#converts dictionaries from json to ordered list given a list of dictionaries and ordered list of desired catagories
+def convert_json(dictionaries, catagory_list=catagoryList):
     results = []
     for dictionary in dictionaries:
         result = []
-        for catagory in catagoryList:
+        for catagory in catagory_list:
             if catagory != "years_with_current_manager":
                 standardized_catagory = re.sub(r'[^a-zA-Z]', '', catagory) #to account for differences in format
                 for k, v in dictionary.items(): #required due to different catagory name variations
@@ -33,14 +33,14 @@ def convert_json(dictionaries):
     return results
 
 #Reads and prints a JSON file
-def read_json(filename):
+def read_json(filename, catagory_list=catagoryList):
     try:
         with open(filename, mode ='r') as file:
             #df = pd.read_json(filename)
             #print(df.head(1).to_dict())
             data = json.load(file) #load and loads are for file vs string
             #dictonaries = json.dumps(data) #same for dump and dumps output
-            converted = convert_json(data) #Convert dictionaries to ordered lists
+            converted = convert_json(data, catagory_list) #Convert dictionaries to ordered lists
             return converted
 
     except FileNotFoundError:
