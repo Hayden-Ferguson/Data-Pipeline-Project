@@ -163,8 +163,8 @@ def read_commands(commands, table="employees"):
             with open("logger.txt", "a") as log: #log truncating table
                 log.write(f"\nemployees table truncated at {datetime.now()}\n")
         elif command.lower() == "train":
-            data = sql_interface.get_dataframe()
-            return machine_learning.train_and_test(data)
+            data = sql_interface.get_dataframe(table)
+            return machine_learning.train_and_test(data) #For testing purposes
         else:
             print("Invalid command/file")
 

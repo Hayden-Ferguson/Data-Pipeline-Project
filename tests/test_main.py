@@ -1,6 +1,7 @@
 import main
 import src.sql_interface as sql_interface
 import os
+import json
 from sklearn.linear_model import LogisticRegression
 import pytest # pyright: ignore[reportMissingImports]
 
@@ -235,16 +236,18 @@ def test_read_commands():
         MonthlyIncome,MonthlyRate,NumCompaniesWorked,Over18,OverTime,PercentSalaryHike,PerformanceRating,RelationshipSatisfaction,\
         StandardHours,StockOptionLevel,TotalWorkingYears,TrainingTimesLastYear,WorkLifeBalance,YearsAtCompany,YearsInCurrentRole,\
         YearsSinceLastPromotion,YearsWithCurrManager\n")
-        file.write("41,Yes,Travel_Rarely,1102,Sales,1,2,Life Sciences,1,1,2,Female,94,3,2,Sales Executive,4,Single,5993,19479,8,Y,Yes,11,3,1,80,0,8,0,1,6,4,0,5")
-        file.write("41,No,Travel_Rarely,1102,Sales,1,2,Life Sciences,1,2,2,Male,94,3,2,Sales Executive,4,Single,5993,19479,8,Y,Yes,11,3,1,80,0,8,0,1,6,4,0,5")
-        file.write("41,Yes,Travel_Rarely,1102,Sales,1,2,Life Sciences,1,3,2,Female,94,3,2,Sales Executive,4,Single,5993,19479,8,Y,Yes,11,3,1,80,0,8,0,1,6,4,0,5")
+        file.write("41,Yes,Travel_Rarely,1102,Sales,1,2,Life Sciences,1,1,2,Female,94,3,2,Sales Executive,4,Single,5993,19479,8,Y,Yes,11,3,1,80,0,8,0,1,6,4,0,5\n")
+        file.write("41,No,Travel_Rarely,1102,Sales,1,2,Life Sciences,1,5,2,Male,94,3,2,Sales Executive,4,Single,5993,19479,8,Y,Yes,11,3,1,80,0,8,0,1,6,4,0,5\n")
+        file.write("41,No,Travel_Rarely,1102,Sales,1,2,Life Sciences,1,7,2,Male,94,3,2,Sales Executive,4,Single,5993,19479,8,Y,Yes,11,3,1,80,0,8,0,1,6,4,0,5\n")
+        file.write("41,No,Travel_Rarely,1102,Sales,1,2,Life Sciences,1,2,2,Male,94,3,2,Sales Executive,4,Single,5993,19479,8,Y,Yes,11,3,1,80,0,8,0,1,6,4,0,5\n")
+        file.write("41,Yes,Travel_Rarely,1102,Sales,1,2,Life Sciences,1,3,2,Male,94,3,2,Sales Executive,4,Single,5993,19479,8,Y,Yes,11,3,1,80,0,8,0,1,6,4,0,5\n")
         file.write("41,Yes,Travel_Rarely,1102,Sales,1,2,Life Sciences,1,4,2,Female,94,3,2,Sales Executive,4,Single,5993,19479,8,Y,Yes,11,3,1,80,0,8,0,1,6,4,0,5")
     main.read_commands(["data/test.csv"], "test")
-    assert sql_interface.count_rows("test") == 4
+    assert sql_interface.count_rows("test") == 6
     main.read_commands(["read"], "test")
     with open("sql_reader.txt", "r") as output:
-        assert output.readlines()[0] == ["(1, 41, True, 'Travel_Rarely', 'Sales', 1, 2, 'Life Sciences', 2, 'Female', 94, 3, 2, 'Sales Executive',"\
-                                      " 'Single', 19479, 8, True, 11, 3, 1, 80, 0, 8, 0, 1, 6, 4, 0, 5)\n"]
+        assert output.readlines()[0] == "(1, 41, True, 'Travel_Rarely', 'Sales', 1, 2, 'Life Sciences', 2, 'Female', 94, 3, 2, 'Sales Executive',"\
+                                      " 'Single', 19479, 8, True, 11, 3, 1, 80, 0, 8, 0, 1, 6, 4, 0, 5)\n"
     model, report = main.read_commands(["train"], "test")
     assert isinstance(model, LogisticRegression)
     assert isinstance(report, str)
@@ -254,6 +257,18 @@ def test_read_commands():
     main.read_commands(["clear"], "test")
     assert sql_interface.count_rows("test") == 0
     #TODO: Make json command
+    dictionary = [{"Age": 41, "Attrition": "Yes", "BusinessTravel": "Travel_Rarely", "DailyRate": 1102, "Department": "Sales",\
+    "DistanceFromHome": 1, "Education": 2, "EducationField": "Life Sciences", "EmployeeCount": 1, "EmployeeNumber": 1,\
+    "EnvironmentSatisfaction": 2, "Gender": "Female", "HourlyRate": 94, "JobInvolvement": 3, "JobLevel": 2, "JobRole": "Sales Executive",\
+    "JobSatisfaction": 4, "MaritalStatus": "Single", "MonthlyIncome": 5993, "MonthlyRate": 19479, "NumCompaniesWorked": 8, "Over18": "Y",\
+    "OverTime": "Yes", "PercentSalaryHike": 11, "PerformanceRating": 3, "RelationshipSatisfaction": 1, "StandardHours": 80,\
+    "StockOptionLevel": 0, "TotalWorkingYears": 8, "TrainingTimesLastYear": 0, "WorkLifeBalance": 1, "YearsAtCompany": 6,\
+    "YearsInCurrentRole": 4, "YearsSinceLastPromotion": 0, "YearsWithCurrManager": 5}]
+    with open("data/test.json", "w") as file:
+        json.dump(dictionary, file, indent=4)
+    main.read_commands(["data/test.json"], "test")
+    assert sql_interface.count_rows("test") == 1
     main.read_commands(["drop"], "test")
     assert sql_interface.table_exists("test") == False
     os.remove("data/test.csv")
+    os.remove("data/test.json")
