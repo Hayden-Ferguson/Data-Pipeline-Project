@@ -1,6 +1,7 @@
 import psycopg2
 import sys
 import os
+import warnings
 import pandas as pd
 from .config import load_config
 from psycopg2.extras import execute_values
@@ -180,6 +181,7 @@ def count_rows(table="employees"):
 #Gets pandas dataframe from table, used for machine learning
 def get_dataframe(table="employees"):
     config = load_config()
+    warnings.filterwarnings("ignore", category=UserWarning)
     try:
         with  psycopg2.connect(**config) as conn:
             with  conn.cursor() as cur:

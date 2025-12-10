@@ -8,6 +8,7 @@ import src.csv_reader as csv_reader
 import src.json_reader as json_reader
 import src.sql_interface as sql_interface
 import src.logger as logger
+import src.machine_learning as machine_learning
 
 #NOTE: robust inputs, can recognize caragory names despite differences with capitalization or underscores.
 #TODO: incorporate machine learning to predict quitting
@@ -161,6 +162,9 @@ def read_commands(commands, table="employees"):
             sql_interface.clear_table(table)
             with open("logger.txt", "a") as log: #log truncating table
                 log.write(f"\nemployees table truncated at {datetime.now()}\n")
+        elif command.lower() == "train":
+            data = sql_interface.get_dataframe()
+            machine_learning.train_and_test(data)
         else:
             print("Invalid command/file")
 

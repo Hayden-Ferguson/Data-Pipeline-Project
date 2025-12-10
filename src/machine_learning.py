@@ -38,6 +38,8 @@ def train(train):
 def test(model, test):
     X = test.drop("attrition", axis=1)
     y = test["attrition"]
+
+    X = pd.get_dummies(X, drop_first=True)
     
     scaler = StandardScaler()
     X_scaled = scaler.fit_transform(X)
@@ -52,4 +54,5 @@ def test(model, test):
 def train_and_test(data):
     training, testing = split_data(data)
     model = train(training)
-    test(model, testing)
+    report = test(model, testing)
+    return (model, report)
