@@ -1,5 +1,6 @@
 import src.machine_learning as machine_learning
 import pandas as pd
+from sklearn.linear_model import LogisticRegression
 import pytest # pyright: ignore[reportMissingImports]
 
 def test_split_data():
@@ -9,3 +10,8 @@ def test_split_data():
     assert training.equals(dataframe)
     dataframe = pd.DataFrame({"a":["c"]})
     assert testing.equals(dataframe)
+
+def test_train():
+    data = pd.DataFrame([{"attrition":"Yes", "a":1}, {"attrition":"Yes", "a":2}, {"attrition":"No", "a":3}, {"attrition":"No", "a":4}])
+    model = machine_learning.train(data)
+    assert isinstance(model, LogisticRegression)
