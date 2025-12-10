@@ -15,3 +15,12 @@ def test_train():
     data = pd.DataFrame([{"attrition":"Yes", "a":1}, {"attrition":"Yes", "a":2}, {"attrition":"No", "a":3}, {"attrition":"No", "a":4}])
     model = machine_learning.train(data)
     assert isinstance(model, LogisticRegression)
+
+def test_test():
+    data = pd.DataFrame([{"attrition":"Yes", "a":1}, {"attrition":"Yes", "a":2}, {"attrition":"No", "a":3}, {"attrition":"No", "a":4}])
+    model = machine_learning.train(data)
+    report = machine_learning.test(model, data)
+    assert isinstance(report, str)
+    assert "precision" in report
+    assert "recall" in report
+    assert "f1-score" in report
