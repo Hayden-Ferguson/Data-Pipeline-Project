@@ -34,4 +34,16 @@ def train(train):
 
     return model
 
-#def test(model, test):
+#Given a model and test
+def test(model, test):
+    X = test.drop("attrition", axis=1)
+    y = test["attrition"]
+    
+    scaler = StandardScaler()
+    X_scaled = scaler.fit_transform(X)
+
+    y_pred = model.predict(X_scaled)
+
+    report = classification_report(y, y_pred)
+    print(report)
+    return report
