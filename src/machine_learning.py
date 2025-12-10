@@ -19,7 +19,7 @@ def split_data(data): #TODO: make this random, probably with sklearn.model_selec
     testing = unsplit.iloc[middle:].reset_index(drop=True)
     return (training, testing)
 
-#Given training data, train a Logistic Regression model with it and return the model
+#Given training data, train a Logistic Regression model with it based on attrition and return the model
 def train(train):
     X = train.drop("attrition", axis=1)
     y = train["attrition"]
@@ -34,7 +34,7 @@ def train(train):
 
     return model
 
-#Given a model and test
+#Given a model and test data, return it's predictions for attrition
 def test(model, test):
     X = test.drop("attrition", axis=1)
     y = test["attrition"]
@@ -47,3 +47,9 @@ def test(model, test):
     report = classification_report(y, y_pred)
     print(report)
     return report
+
+#Given a pandas dataframe, train and test a model on the data
+def train_and_test(data):
+    training, testing = split_data(data)
+    model = train(training)
+    test(model, testing)
