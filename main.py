@@ -164,7 +164,7 @@ def read_commands(commands, table="employees"):
                 log.write(f"\nemployees table truncated at {datetime.now()}\n")
         elif command.lower() == "train":
             data = sql_interface.get_dataframe()
-            machine_learning.train_and_test(data)
+            return machine_learning.train_and_test(data)
         else:
             print("Invalid command/file")
 
