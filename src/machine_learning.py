@@ -7,9 +7,10 @@ catagoryList=["employee_number", "age", "attrition", "business_travel", "departm
     "relationship_satisfaction", "standard_hours", "stock_option_level", "total_working_years", "training_times_last_year", \
     "work_life_balance", "years_at_company", "years_in_current_role", "years_since_last_promotion", "years_with_current_manager"]
 
-def seperate_data(data):
-    del data["employee_number"]
+#splits data into testing and training data, and removes data not being trained on
+def split_data(data):
+    unsplit = data.drop(columns=["employee_number"])
     middle = len(data)//2
-    training = data.iloc[:middle]
-    testing = data.iloc[middle:]
+    training = unsplit.iloc[:middle].reset_index(drop=True)
+    testing = unsplit.iloc[middle:].reset_index(drop=True)
     return (training, testing)
