@@ -5,14 +5,14 @@ import os
 
 #List of catagories for reference #TODO: modify functions to not use regex if not required
 #NOTE: years_with_current_manager was YearsWithCurrManager in original source
-catagoryList=["employee_number", "age", "attrition", "business_travel", "department", "distance_from_home", \
+standard_catagories=["employee_number", "age", "attrition", "business_travel", "department", "distance_from_home", \
     "education", "education_field", "environment_satisfaction", "gender", "hourly_rate", "job_involvement", "job_level", \
     "job_role", "marital_status", "monthly_rate", "num_companies_worked", "overtime", "percent_salary_hike", "performance_rating", \
     "relationship_satisfaction", "standard_hours", "stock_option_level", "total_working_years", "training_times_last_year", \
     "work_life_balance", "years_at_company", "years_in_current_role", "years_since_last_promotion", "years_with_current_manager"]
 
 #converts dictionaries from json to ordered list given a list of dictionaries and ordered list of desired catagories
-def convert_json(dictionaries, catagory_list=catagoryList):
+def convert_json(dictionaries, catagory_list=standard_catagories):
     results = []
     for dictionary in dictionaries:
         result = []
@@ -33,7 +33,7 @@ def convert_json(dictionaries, catagory_list=catagoryList):
     return results
 
 #Reads and prints a JSON file
-def read_json(filename, catagory_list=catagoryList):
+def read_json(filename, catagory_list=standard_catagories):
     try:
         with open(filename, mode ='r') as file:
             #df = pd.read_json(filename)

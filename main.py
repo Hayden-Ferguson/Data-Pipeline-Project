@@ -16,7 +16,7 @@ import src.machine_learning as machine_learning
 
 #List of catagories for reference #TODO: modify functions to not use regex if not required
 #NOTE: years_with_current_manager was YearsWithCurrManager in original source
-catagoryList=["employee_number", "age", "attrition", "business_travel", "department", "distance_from_home", \
+standard_catagories=["employee_number", "age", "attrition", "business_travel", "department", "distance_from_home", \
     "education", "education_field", "environment_satisfaction", "gender", "hourly_rate", "job_involvement", "job_level", \
     "job_role", "marital_status", "monthly_rate", "num_companies_worked", "overtime", "percent_salary_hike", "performance_rating", \
     "relationship_satisfaction", "standard_hours", "stock_option_level", "total_working_years", "training_times_last_year", \
@@ -74,7 +74,7 @@ def check_valid(value_list):
         for catagory in notNullCatagories: #Not null field is null
             value = value_list[catagory]
             if value == None or value == "": #assume empty entires in csv means Null
-                return (False, f"{catagoryList[catagory]} is Null")
+                return (False, f"{standard_catagories[catagory]} is Null")
         
         #print(type(value))
         if not (type(value_list[1]) == int or re.match(r'^[+-]?[0-9]+$', value_list[1])) or int(value_list[1]) < 18: #Not an adult or non-integer
@@ -97,13 +97,13 @@ def check_valid(value_list):
         for catagory in nonNegativeCatagories: #Field that should be a non-negative integer isn't
             value = value_list[catagory]
             if value != None and (not (type(value) == int or re.match(r'^[+-]?[0-9]+$', value)) or int(value) < 0): #not Null and not an integer or negative
-                return (False, f"{catagoryList[catagory]} is {value}, which is either negative or not an integer")
+                return (False, f"{standard_catagories[catagory]} is {value}, which is either negative or not an integer")
 
         gradingCatagories = [6, 8, 11, 12, 19, 20, 25]
         for catagory in gradingCatagories: #Field for 1-5 integer grading has value outside of that.
             value = value_list[catagory] #not Null and not an integer or outside 1-5 range
             if value != None and (not (type(value) == int or re.match(r'^[+-]?[0-9]+$', value)) or int(value) < 1 or int(value) > 5): 
-                return (False, f"{catagoryList[catagory]} is {value}, which is outside of the 1-5 range or not an integer")
+                return (False, f"{standard_catagories[catagory]} is {value}, which is outside of the 1-5 range or not an integer")
         
         return (True, "Duplicate primary key") #Everything checks out, if rejected it's due to being a duplicate
     except Exception as e:

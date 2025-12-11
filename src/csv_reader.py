@@ -7,7 +7,7 @@ import os
 
 #List of catagories for reference
 #NOTE: years_with_current_manager was YearsWithCurrManager in original source
-catagoryList=["employee_number", "age", "attrition", "business_travel", "department", "distance_from_home", \
+standard_catagories=["employee_number", "age", "attrition", "business_travel", "department", "distance_from_home", \
     "education", "education_field", "environment_satisfaction", "gender", "hourly_rate", "job_involvement", "job_level", \
     "job_role", "marital_status", "monthly_rate", "num_companies_worked", "overtime", "percent_salary_hike", "performance_rating", \
     "relationship_satisfaction", "standard_hours", "stock_option_level", "total_working_years", "training_times_last_year", \
@@ -33,10 +33,10 @@ def get_csv_param(value_list, param, catagoryDict):
     return value_list[catagoryDict[param]]
 
 #Given a value list, ordered list of desired catagories, and a dictionary of catagories and positions, returns an ordered list of parameters
-def sort_csv_params(value_list, catagoryList, catagoryDict):
+def sort_csv_params(value_list, catagory_list, catagory_dict):
     ans = []
-    for catagory in catagoryList:
-        ans.append(get_csv_param(value_list, re.sub(r'[^a-zA-Z]', '', catagory).lower(), catagoryDict))
+    for catagory in catagory_list:
+        ans.append(get_csv_param(value_list, re.sub(r'[^a-zA-Z]', '', catagory).lower(), catagory_dict))
     return ans
 #Old manual return, may be more efficient
 '''[get_csv_param(value_list, "employeenumber", catagoryDict), get_csv_param(value_list, "age", catagoryDict),\
@@ -63,7 +63,7 @@ def read_csv(filename):
             #Find catagories from CSV file to match up to SQL table
             #Dictionary standardized to help clean data. yearswithcurrmanager is from original data
             catagories = next(csvFile) #reads catagories of csv
-            catagoryDict = get_catagory_dict(catagoryList, catagories) #gets dictionary of catagories and their position in list
+            catagoryDict = get_catagory_dict(standard_catagories, catagories) #gets dictionary of catagories and their position in list
             notNullCatagories = ["employeenumber", "age", "businesstravel", "department", "education", "educationfield", "hourlyrate", "joblevel", "jobrole", "monthlyrate"]
             for catagory in notNullCatagories: #ensures all non-null field exist
                 if catagoryDict[catagory] == None: #If a Not Null field is Null
@@ -72,7 +72,7 @@ def read_csv(filename):
             
             inputs = [] #NOTE: lines with " causes errors
             for line in csvFile: #Function does not do multiple lines at once do to limits of reading file
-                sorted = sort_csv_params(line, catagoryList, catagoryDict) 
+                sorted = sort_csv_params(line, standard_catagories, catagoryDict) 
                 inputs.append(sorted)
             return inputs
         
