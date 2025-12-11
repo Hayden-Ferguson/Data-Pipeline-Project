@@ -155,13 +155,13 @@ def read_commands(commands, table="employees"):
         elif command.lower() == "drop":
             sql_interface.drop_table(table)
             with open("logger.txt", "a") as log: #log dropping table
-                log.write(f"\nemployees table dropped at {datetime.now()}\n")
+                log.write(f"\n{table}} table dropped at {datetime.now()}\n")
         elif command.lower() == "read":
             sql_interface.read_table(table)
         elif command.lower() == "clear" or command.lower() == "truncate":
             sql_interface.clear_table(table)
             with open("logger.txt", "a") as log: #log truncating table
-                log.write(f"\nemployees table truncated at {datetime.now()}\n")
+                log.write(f"\n{table} table truncated at {datetime.now()}\n")
         elif command.lower() == "train":
             data = sql_interface.get_dataframe(table)
             return machine_learning.train_and_test(data) #For testing purposes
