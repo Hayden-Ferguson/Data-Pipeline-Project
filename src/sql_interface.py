@@ -118,7 +118,7 @@ def fill_database(input_list, table="employees"): #table for testing purposes
         print(f"Error: The following error occured trying to insert into the database: {error} on line {exc_tb.tb_lineno} in {file_name}")
 
 #Drops the employee table. Mostly used for resetting the employee table.
-def drop_table(table="employees"):
+def drop_table(table="employees"): #TODO: Check all other functions can handle dropped/nonexistent table
     try:
         config = load_config()
         sql = f"DROP TABLE {table}"

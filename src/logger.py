@@ -1,5 +1,7 @@
 from datetime import datetime
 
+#TODO: Modify this to use logger instead of just writing to a file
+
 #Start a new logger session given source, number of rows from source, and path to source
 #TODO: modify this once we have YAML configuration to not need source and path
 def log_start(source, rows, path, file="logger.txt"):
