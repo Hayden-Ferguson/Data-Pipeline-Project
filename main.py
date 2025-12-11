@@ -132,7 +132,7 @@ def upsert_call(inputs, filename, table="employees"):
         filtered = filter_inputs(inputs)
         validated = check_all_valid(filtered)
         logger.log_validation(filename, validated)
-        logger.log_rejects(validated[1])
+        logger.log_rejects(validated[1]) #TODO: make this more readable
         start = datetime.now()
         results = sql_interface.fill_database(validated[0], table) #Fill database with valid results
         logger.log_load(filename, results[0], results[1], start)
@@ -155,7 +155,7 @@ def read_commands(commands, table="employees"):
         elif command.lower() == "drop":
             sql_interface.drop_table(table)
             with open("logger.txt", "a") as log: #log dropping table
-                log.write(f"\n{table}} table dropped at {datetime.now()}\n")
+                log.write(f"\n{table} table dropped at {datetime.now()}\n")
         elif command.lower() == "read":
             sql_interface.read_table(table)
         elif command.lower() == "clear" or command.lower() == "truncate":
