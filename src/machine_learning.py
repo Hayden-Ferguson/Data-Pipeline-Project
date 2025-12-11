@@ -19,13 +19,13 @@ def split_data(data): #TODO: make this random, probably with sklearn.model_selec
 
 #Given training data, train a Logistic Regression model with it based on attrition and return the model
 def train(train):
-    X = train.drop("attrition", axis=1)
+    X = train.drop("attrition", axis=1) #seperates what we're trying to predict from data
     y = train["attrition"]
 
-    X = pd.get_dummies(X, drop_first=True)
+    X = pd.get_dummies(X, drop_first=True) #Changes catagorical data into data useful for machine learning
     
     scaler = StandardScaler()
-    X_scaled = scaler.fit_transform(X)
+    X_scaled = scaler.fit_transform(X) #standardize numerical data against each other
     
     model = LogisticRegression(max_iter=500)
     model.fit(X_scaled, y)
